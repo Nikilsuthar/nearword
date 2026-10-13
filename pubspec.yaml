@@ -1,0 +1,43 @@
+name: nearword
+description: "NearWord - guess the secret word by meaning. Daily puzzle, categories and live multiplayer battles."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.6.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Targets Flutter 3.27 / Dart 3.6 (the SDK installed on this PC).
+  cupertino_icons: ^1.0.8
+  get: ^4.6.6
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
+  flutter_animate: ^4.5.2
+  confetti: ^0.8.0
+  share_plus: ^10.1.2
+  google_mobile_ads: ^5.2.0
+  http: ^1.2.2
+  url_launcher: ^6.3.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  mocktail: ^1.0.4
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  image_path: assets/icon/icon.png
+  adaptive_icon_background: "#4A2FD6"
+  adaptive_icon_foreground: assets/icon/icon_fg.png
+  remove_alpha_ios: true
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/data/
