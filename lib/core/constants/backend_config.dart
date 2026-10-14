@@ -3,7 +3,7 @@
 /// Setup (2 minutes, free Spark plan):
 ///  1. console.firebase.google.com -> Add project -> Build -> Realtime Database
 ///     -> Create database -> start in *test mode*.
-///  2. Either paste the database URL into [defaultUrl] below and rebuild, or
+///  2. Either build with --dart-define=NEARWORD_RTDB_URL=URL, or
 ///     enter it on the phone: Settings -> Online battles (no rebuild needed).
 ///     Example: 'https://nearword-default-rtdb.firebaseio.com'
 ///  3. (Recommended) paste database.rules.json from the repo root into the
@@ -15,7 +15,9 @@ class BackendConfig {
   BackendConfig._();
 
   /// Baked-in URL (used when the player has not entered one in Settings).
-  static const String defaultUrl = '';
+  /// Supplied at build time so it is not committed to the repository:
+  ///   flutter build apk --release --dart-define=NEARWORD_RTDB_URL=https://...
+  static const String defaultUrl = String.fromEnvironment('NEARWORD_RTDB_URL');
 
   static String _override = '';
 
