@@ -1,18 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
+import '../../../core/widgets/ui_kit.dart';
 import '../../../data/models/battle.dart';
-
-const List<Color> kAvatarColors = [
-  Color(0xFF7C5CFF),
-  Color(0xFF22D3EE),
-  Color(0xFFFF5CAA),
-  Color(0xFF34E3A0),
-  Color(0xFFFFC857),
-  Color(0xFFFF8A5C),
-  Color(0xFF5C9DFF),
-  Color(0xFFB45CFF),
-];
 
 class PlayerAvatar extends StatelessWidget {
   const PlayerAvatar({super.key, required this.player, this.size = 36});
@@ -21,32 +12,11 @@ class PlayerAvatar extends StatelessWidget {
   final double size;
 
   @override
-  Widget build(BuildContext context) {
-    final color = kAvatarColors[player.avatar % kAvatarColors.length];
-    final initial =
-        player.name.isEmpty ? '?' : player.name.characters.first.toUpperCase();
-    return Container(
-      width: size,
-      height: size,
-      alignment: Alignment.center,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [color, color.withValues(alpha: 0.65)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-      ),
-      child: Text(
-        initial,
-        style: TextStyle(
-          color: Colors.white,
-          fontWeight: FontWeight.w900,
-          fontSize: size * 0.45,
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => InitialAvatar(
+        name: player.name,
+        colorIndex: player.avatar,
+        size: size,
+      );
 }
 
 String placeLabel(int place) => switch (place) {
@@ -63,11 +33,15 @@ class StandingRow extends StatelessWidget {
     required this.place,
     required this.player,
     required this.isMe,
+    this.payout,
   });
 
   final int place;
   final BattlePlayer player;
   final bool isMe;
+
+  /// Coins this player received once the room is settled.
+  final int? payout;
 
   @override
   Widget build(BuildContext context) {
@@ -78,10 +52,10 @@ class StandingRow extends StatelessWidget {
             ? AppColors.forRank(player.bestRank)
             : scheme.onSurface.withValues(alpha: 0.4);
     final status = player.solved
-        ? 'Solved · ${player.guesses} guesses'
+        ? 'row_solved'.trParams({'n': '${player.guesses}'})
         : player.hasGuessed
-            ? '${player.guesses} guesses'
-            : 'No guesses yet';
+            ? 'row_guesses'.trParams({'n': '${player.guesses}'})
+            : 'row_none'.tr;
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -109,7 +83,10 @@ class StandingRow extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  isMe ? '${player.name} (you)' : player.name,
+                  isMe
+                      ? 'row_you'.trParams({'name': player.name})
+                      : player.name,
+                  maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontWeight: FontWeight.w800,
@@ -126,6 +103,10 @@ class StandingRow extends StatelessWidget {
               ],
             ),
           ),
+          if (payout != null && payout! > 0) ...[
+            CoinText(payout!, size: 16),
+            const SizedBox(width: 10),
+          ],
           Text(
             player.solved
                 ? '🎯'

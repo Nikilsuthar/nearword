@@ -51,7 +51,7 @@ class GuessInput extends GetView<GameController> {
                     fontWeight: FontWeight.w700,
                   ),
                   onSubmitted: (_) => controller.submit(),
-                  decoration: const InputDecoration(hintText: 'Type a word…'),
+                  decoration: InputDecoration(hintText: 'type_a_word'.tr),
                 ),
               ),
               const SizedBox(width: 10),

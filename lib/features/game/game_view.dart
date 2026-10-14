@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/constants/app_colors.dart';
+import '../../core/utils/labels.dart';
 import '../../core/widgets/app_background.dart';
 import '../battle/battle_controller.dart';
 import '../battle/widgets/battle_strip.dart';
@@ -11,12 +12,6 @@ import 'widgets/guess_input.dart';
 import 'widgets/guess_tile.dart';
 import 'widgets/latest_card.dart';
 import 'widgets/radar_view.dart';
-
-String _clock(int seconds) {
-  final m = (seconds ~/ 60).toString();
-  final s = (seconds % 60).toString().padLeft(2, '0');
-  return '$m:$s';
-}
 
 class GameView extends GetView<GameController> {
   const GameView({super.key});
@@ -29,7 +24,7 @@ class GameView extends GetView<GameController> {
         actions: [
           TextButton(
             onPressed: () => Get.back(result: false),
-            child: const Text('Keep playing'),
+            child: Text('keep_playing'.tr),
           ),
           FilledButton(
             onPressed: () => Get.back(result: true),
@@ -44,11 +39,9 @@ class GameView extends GetView<GameController> {
   Future<void> _giveUp() async {
     final battle = controller.isBattle;
     final ok = await _confirm(
-      'Give up?',
-      battle
-          ? 'You will stop guessing, but your best rank still counts.'
-          : 'The secret word will be revealed.',
-      'Give up',
+      'give_up_title'.tr,
+      battle ? 'give_up_body_battle'.tr : 'give_up_body'.tr,
+      'give_up'.tr,
     );
     if (ok) controller.giveUp();
   }
@@ -61,9 +54,9 @@ class GameView extends GetView<GameController> {
         if (didPop || !controller.isBattle) return;
         if (!controller.isPlaying) return;
         if (await _confirm(
-          'Leave the battle?',
-          'Leaving counts as giving up.',
-          'Leave',
+          'leave_battle_title'.tr,
+          'leave_battle_body'.tr,
+          'leave'.tr,
         )) {
           controller.giveUp();
         }
@@ -75,7 +68,7 @@ class GameView extends GetView<GameController> {
           actions: [
             Obx(
               () => IconButton(
-                tooltip: 'Hints',
+                tooltip: 'hints'.tr,
                 icon: const Icon(Icons.lightbulb_outline_rounded),
                 onPressed: controller.isPlaying &&
                         !controller.isLoading.value &&
@@ -94,7 +87,7 @@ class GameView extends GetView<GameController> {
               ),
             ),
             PopupMenuButton<String>(
-              tooltip: 'Menu',
+              tooltip: 'settings'.tr,
               onSelected: (v) {
                 if (v == 'giveup') _giveUp();
               },
@@ -102,7 +95,7 @@ class GameView extends GetView<GameController> {
                 PopupMenuItem(
                   value: 'giveup',
                   enabled: controller.isPlaying,
-                  child: const Text('Give up'),
+                  child: Text('give_up'.tr),
                 ),
               ],
             ),
@@ -120,12 +113,12 @@ class GameView extends GetView<GameController> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Text(error, textAlign: TextAlign.center),
+                    Text(error.tr, textAlign: TextAlign.center),
                     const SizedBox(height: 12),
                     FilledButton(
                       onPressed: () =>
                           controller.loadPuzzle(controller.initialPuzzleId),
-                      child: const Text('Retry'),
+                      child: Text('retry'.tr),
                     ),
                   ],
                 ),
@@ -174,7 +167,9 @@ class _Body extends StatelessWidget {
                             icon: Icons.near_me_rounded,
                             color:
                                 best == null ? null : AppColors.forRank(best),
-                            label: best == null ? 'Best –' : 'Best #$best',
+                            label: best == null
+                                ? 'best_none'.tr
+                                : 'best_n'.trParams({'n': '$best'}),
                           ),
                         ],
                       ),
@@ -188,13 +183,13 @@ class _Body extends StatelessWidget {
                     return StatPill(
                       icon: Icons.timer_rounded,
                       color: left <= 20 ? AppColors.red : AppColors.cyan,
-                      label: _clock(left),
+                      label: clockLabel(left),
                     );
                   })
                 else
                   StatPill(
                     icon: Icons.timer_outlined,
-                    label: _clock(controller.elapsedSeconds.value),
+                    label: clockLabel(controller.elapsedSeconds.value),
                   ),
               ],
             );
@@ -231,16 +226,16 @@ class _Body extends StatelessWidget {
                 visualDensity: VisualDensity.compact,
                 side: BorderSide(color: scheme.outline),
               ),
-              segments: const [
+              segments: [
                 ButtonSegment(
                   value: false,
                   icon: Icon(Icons.view_list_rounded, size: 18),
-                  label: Text('List'),
+                  label: Text('list_tab'.tr),
                 ),
                 ButtonSegment(
                   value: true,
                   icon: Icon(Icons.radar_rounded, size: 18),
-                  label: Text('Radar'),
+                  label: Text('radar_tab'.tr),
                 ),
               ],
               selected: {controller.radarView.value},

@@ -1,3 +1,5 @@
+import 'package:get/get.dart';
+
 import '../../core/constants/app_constants.dart';
 import '../../data/models/game_result.dart';
 
@@ -17,7 +19,8 @@ class ShareText {
   static String build(GameResult r) {
     final buffer = StringBuffer()
       ..writeln(
-        '${AppConstants.appName} · ${r.title} · ${r.won ? '${r.guessCount} guesses' : 'gave up after ${r.guessCount}'}',
+        (r.won ? 'share_line' : 'share_gaveup')
+            .trParams({'t': r.title, 'n': '${r.guessCount}'}),
       );
 
     final squares = r.guessRanks.map(square).toList();

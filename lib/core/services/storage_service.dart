@@ -10,6 +10,11 @@ import '../constants/app_constants.dart';
 /// Thin wrapper around Hive. Values are stored as JSON-friendly maps, so no
 /// code generation / type adapters are needed.
 class StorageService extends GetxService {
+  /// Prefix for the box names (tests use it to simulate several phones).
+  StorageService({this.namePrefix = ''});
+
+  final String namePrefix;
+
   late Box<dynamic> _settings;
   late Box<dynamic> _games;
 
@@ -23,8 +28,8 @@ class StorageService extends GetxService {
   /// calling `Hive.init(tempDir)` yourself.
   Future<StorageService> init({bool useFlutter = true}) async {
     if (useFlutter) await Hive.initFlutter();
-    _settings = await Hive.openBox(AppConstants.settingsBox);
-    _games = await Hive.openBox(AppConstants.gamesBox);
+    _settings = await Hive.openBox('$namePrefix${AppConstants.settingsBox}');
+    _games = await Hive.openBox('$namePrefix${AppConstants.gamesBox}');
     return this;
   }
 
@@ -34,6 +39,62 @@ class StorageService extends GetxService {
       _settings.isOpen ? _settings.get(key) as T? : null;
   Future<void> setSetting(String key, Object? value) async {
     if (_settings.isOpen) await _settings.put(key, value);
+  }
+
+  // --- Recently played secrets (so words do not repeat) ---------------------
+
+  static const _recentKey = 'recent_secrets';
+  static const _recentMax = 400;
+
+  Set<String> recentSecrets() =>
+      (getSetting<List<dynamic>>(_recentKey) ?? const []).cast<String>().toSet();
+
+  void addRecentSecret(String word) {
+    final list =
+        (getSetting<List<dynamic>>(_recentKey) ?? const []).cast<String>().toList()
+          ..remove(word)
+          ..add(word);
+    final trimmed =
+        list.length > _recentMax ? list.sublist(list.length - _recentMax) : list;
+    setSetting(_recentKey, trimmed);
+  }
+
+  // --- Room coin escrow ---------------------------------------------------------
+  //
+  // Coins put into a room's pot are removed from the balance right away and
+  // recorded here until the room pays out (or refunds), so a crash or a closed
+  // app can never lose or duplicate coins.
+
+  static const _escrowKey = 'room_escrow';
+  static const _paidKey = 'room_paid';
+
+  /// code -> {stake, kind, ts}
+  Map<String, Map<String, dynamic>> escrows() {
+    final raw = getSetting<String>(_escrowKey);
+    if (raw == null) return {};
+    final m = jsonDecode(raw) as Map<String, dynamic>;
+    return {for (final e in m.entries) e.key: (e.value as Map).cast<String, dynamic>()};
+  }
+
+  void setEscrow(String code, Map<String, dynamic> info) {
+    final m = escrows()..[code] = info;
+    setSetting(_escrowKey, jsonEncode(m));
+  }
+
+  void clearEscrow(String code) {
+    final m = escrows()..remove(code);
+    setSetting(_escrowKey, jsonEncode(m));
+  }
+
+  bool isRoomPaid(String code) =>
+      (getSetting<List<dynamic>>(_paidKey) ?? const []).contains(code);
+
+  void markRoomPaid(String code) {
+    final list =
+        (getSetting<List<dynamic>>(_paidKey) ?? const []).cast<String>().toList();
+    if (list.contains(code)) return;
+    list.add(code);
+    setSetting(_paidKey, list.length > 200 ? list.sublist(list.length - 200) : list);
   }
 
   // --- Purchase flags (set by the IAP service in Phase 5) -----------------------

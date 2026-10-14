@@ -27,7 +27,7 @@ class _LogoPainter extends CustomPainter {
       ..shader = const LinearGradient(
         begin: Alignment.topLeft,
         end: Alignment.bottomRight,
-        colors: [AppColors.brand, Color(0xFF4A2FD6)],
+        colors: [AppColors.brand, Color(0xFF13A8C4)],
       ).createShader(Offset.zero & size);
     canvas.drawRRect(
       RRect.fromRectAndRadius(Offset.zero & size, Radius.circular(r * 0.58)),
@@ -70,7 +70,7 @@ class Wordmark extends StatelessWidget {
         Text('Near', style: base),
         ShaderMask(
           shaderCallback: (rect) => const LinearGradient(
-            colors: [AppColors.brandSoft, AppColors.cyan],
+            colors: [AppColors.brandSoft, AppColors.teal],
           ).createShader(rect),
           child: Text('Word', style: base.copyWith(color: Colors.white)),
         ),

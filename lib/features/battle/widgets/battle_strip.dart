@@ -59,7 +59,7 @@ class BattleStrip extends StatelessWidget {
                       ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 70),
                         child: Text(
-                          me ? 'You' : p.name,
+                          me ? 'you_short'.tr : p.name,
                           overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
                               fontWeight: FontWeight.w800, fontSize: 12.5),
@@ -67,7 +67,7 @@ class BattleStrip extends StatelessWidget {
                       ),
                       Text(
                         p.solved
-                            ? 'Solved 🎯'
+                            ? '🎯'
                             : p.hasGuessed
                                 ? '#${p.bestRank}'
                                 : '–',

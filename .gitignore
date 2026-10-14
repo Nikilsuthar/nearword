@@ -47,3 +47,7 @@ dist/
 .firebaserc
 .firebase/
 firebase-debug.log
+
+web/
+build/
+tools/_tmp/

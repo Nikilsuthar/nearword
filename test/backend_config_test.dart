@@ -2,7 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:nearword/core/constants/backend_config.dart';
 
 void main() {
-  tearDown(() => BackendConfig.override = '');
+  tearDown(() => BackendConfig.urlOverride = '');
 
   test('normalize strips spaces, slashes and .json', () {
     expect(
@@ -31,10 +31,10 @@ void main() {
 
   test('override wins over the default and drives online', () {
     expect(BackendConfig.online, isFalse);
-    BackendConfig.override = 'https://a-rtdb.firebaseio.com';
+    BackendConfig.urlOverride = 'https://a-rtdb.firebaseio.com';
     expect(BackendConfig.online, isTrue);
     expect(BackendConfig.databaseUrl, 'https://a-rtdb.firebaseio.com');
-    BackendConfig.override = '';
+    BackendConfig.urlOverride = '';
     expect(BackendConfig.online, isFalse);
   });
 }

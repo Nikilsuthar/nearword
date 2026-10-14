@@ -9,7 +9,8 @@ class GameBinding extends Bindings {
   @override
   void dependencies() {
     final id = Get.arguments as String;
-    final battle = id.startsWith('battle-') && Get.isRegistered<BattleController>()
+    final isRoom = id.startsWith('battle-') || id.startsWith('chal-');
+    final battle = isRoom && Get.isRegistered<BattleController>()
         ? Get.find<BattleController>()
         : null;
     Get.lazyPut(
@@ -18,7 +19,7 @@ class GameBinding extends Bindings {
         battle: battle,
         // Replace the game route so Back from Result returns to Home/Categories.
         onFinished: (result) => Get.offNamed(
-          battle != null ? Routes.battleResult : Routes.result,
+          battle != null ? Routes.roomResult : Routes.result,
           arguments: result,
         ),
       ),

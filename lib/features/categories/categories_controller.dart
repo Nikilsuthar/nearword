@@ -1,7 +1,8 @@
 import 'package:get/get.dart';
 
 import '../../core/constants/app_constants.dart';
-import '../../core/services/ad_service.dart';
+import '../../core/services/ads.dart';
+import '../../core/services/settings_service.dart';
 import '../../core/services/storage_service.dart';
 import '../../data/models/category.dart';
 import '../../data/repositories/puzzle_repository.dart';
@@ -27,7 +28,7 @@ class CategoriesController extends GetxController {
   final _repo = Get.find<PuzzleRepository>();
   final _stats = Get.find<StatsRepository>();
   final _storage = Get.find<StorageService>();
-  final _ads = Get.find<AdService>();
+  final _settings = Get.find<SettingsService>();
 
   final RxList<CategoryItem> items = <CategoryItem>[].obs;
   RxInt get coins => _stats.coins;
@@ -38,8 +39,12 @@ class CategoriesController extends GetxController {
   void onInit() {
     super.onInit();
     _rebuild();
-    // Refresh whenever a game is saved/finished or coins are spent.
+    Ads.prepareRewarded();
+    // Refresh whenever a game is saved/finished or coins are spent, or the
+    // word style / level changes.
     ever(_storage.revision, (_) => _rebuild());
+    ever(_settings.level, (_) => _rebuild());
+    ever(_settings.wordSet, (_) => _rebuild());
   }
 
   void _rebuild() {
@@ -49,7 +54,7 @@ class CategoriesController extends GetxController {
         CategoryItem(
           category: c,
           solved: done.where((id) => id.startsWith('cat-${c.id}-')).length,
-          total: _repo.sizeOf(c.id),
+          total: _repo.sizeOf(c.id, _settings.wordSet.value, _settings.level.value),
           locked: !_stats.isCategoryUnlocked(c),
         ),
     ]);
@@ -64,11 +69,9 @@ class CategoriesController extends GetxController {
     return ok;
   }
 
-  RxBool get rewardedReady => _ads.rewardedReady;
-
   /// Rewarded ad -> unlock the category for 24 hours. Returns success.
   Future<bool> unlockForDay(CategoryItem item) async {
-    final earned = await _ads.showRewarded();
+    final earned = await Ads.rewarded('category_unlock');
     if (earned) {
       _stats.unlockCategoryTemporarily(item.category);
       _rebuild();
@@ -79,7 +82,11 @@ class CategoriesController extends GetxController {
   void play(CategoryItem item) {
     Get.toNamed(
       Routes.game,
-      arguments: _repo.randomCategoryId(item.category.id),
+      arguments: _repo.randomCategoryId(
+        item.category.id,
+        _settings.wordSet.value,
+        _settings.level.value,
+      ),
     );
   }
 }

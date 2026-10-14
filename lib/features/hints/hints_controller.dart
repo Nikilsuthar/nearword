@@ -1,7 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../core/constants/app_constants.dart';
-import '../../core/services/ad_service.dart';
+import '../../core/services/ads.dart';
 import '../../data/repositories/stats_repository.dart';
 import '../game/game_controller.dart';
 import 'hint_engine.dart';
@@ -13,46 +13,43 @@ enum HintPayment { coins, rewardedAd }
 class HintsController extends GetxController {
   final _game = Get.find<GameController>();
   final _stats = Get.find<StatsRepository>();
-  final _ads = Get.find<AdService>();
 
   final RxBool busy = false.obs;
 
   RxInt get coins => _stats.coins;
-  RxBool get rewardedReady => _ads.rewardedReady;
+
+  @override
+  void onInit() {
+    super.onInit();
+    Ads.prepareRewarded();
+  }
 
   /// Pro Pass = unlimited hints.
   bool get unlimited => _stats.hasPro;
 
   int costFor(HintType type) => switch (type) {
-    HintType.betterWord => AppConstants.hintBetterWordCost,
-    HintType.firstLetter => AppConstants.hintFirstLetterCost,
-    HintType.wordLength => AppConstants.hintLengthCost,
-  };
+        HintType.betterWord => AppConstants.hintBetterWordCost,
+        HintType.firstLetter => AppConstants.hintFirstLetterCost,
+        HintType.wordLength => AppConstants.hintLengthCost,
+      };
 
   bool isAvailable(HintType type) => _game.canApplyHint(type);
 
-  /// Returns a user-facing message when the hint could not be used, or null on
-  /// success.
+  /// Returns a translation key describing why the hint could not be used, or
+  /// null on success.
   Future<String?> use(HintType type, HintPayment payment) async {
     if (busy.value) return null;
     // Validate first so a player is never charged for a no-op hint.
-    if (!_game.canApplyHint(type)) {
-      return 'This hint is not available right now.';
-    }
+    if (!_game.canApplyHint(type)) return 'hint_err_unavailable';
 
     busy.value = true;
     try {
       if (!unlimited) {
         switch (payment) {
           case HintPayment.coins:
-            if (!_stats.spendCoins(costFor(type))) {
-              return 'Not enough coins. Win puzzles or watch an ad for a free hint.';
-            }
+            if (!_stats.spendCoins(costFor(type))) return 'hint_err_coins';
           case HintPayment.rewardedAd:
-            final earned = await _ads.showRewarded();
-            if (!earned) {
-              return 'Ad not available right now. Please try again later.';
-            }
+            if (!await Ads.rewarded('hint')) return 'hint_err_ad';
         }
       }
       if (!_game.applyHint(type)) {
@@ -60,7 +57,7 @@ class HintsController extends GetxController {
         if (!unlimited && payment == HintPayment.coins) {
           _stats.addCoins(costFor(type));
         }
-        return 'This hint is not available right now.';
+        return 'hint_err_unavailable';
       }
       return null;
     } finally {

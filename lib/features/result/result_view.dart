@@ -8,6 +8,9 @@ import 'package:get/get.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/format.dart';
 import '../../core/widgets/app_background.dart';
+import '../../data/models/puzzle.dart';
+import '../../routes/app_routes.dart';
+import '../home/home_controller.dart';
 import 'result_controller.dart';
 import 'widgets/stat_chip.dart';
 
@@ -48,7 +51,7 @@ class ResultView extends GetView<ResultController> {
               ),
               const SizedBox(height: 14),
               Text(
-                r.won ? 'You found it!' : 'The word was…',
+                r.won ? 'won_title'.tr : 'lost_title'.tr,
                 textAlign: TextAlign.center,
                 style: theme.textTheme.titleLarge,
               ),
@@ -72,7 +75,7 @@ class ResultView extends GetView<ResultController> {
                 ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3),
               ),
               Text(
-                '${r.title} · ${r.difficulty.name}',
+                '${r.title} · ${'level_${r.difficulty.name}'.tr}',
                 textAlign: TextAlign.center,
                 style: theme.textTheme.bodyMedium?.copyWith(
                   color: scheme.onSurface.withValues(alpha: 0.65),
@@ -85,7 +88,7 @@ class ResultView extends GetView<ResultController> {
                     child: StatChip(
                       icon: Icons.tag_rounded,
                       value: '${r.guessCount}',
-                      label: 'Guesses',
+                      label: 'stat_guesses'.tr,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -93,7 +96,7 @@ class ResultView extends GetView<ResultController> {
                     child: StatChip(
                       icon: Icons.timer_outlined,
                       value: formatDuration(r.seconds),
-                      label: 'Time',
+                      label: 'stat_time'.tr,
                     ),
                   ),
                   const SizedBox(width: 8),
@@ -101,7 +104,7 @@ class ResultView extends GetView<ResultController> {
                     child: StatChip(
                       icon: Icons.lightbulb_outline_rounded,
                       value: '${r.hintsUsed}',
-                      label: 'Hints',
+                      label: 'stat_hints'.tr,
                     ),
                   ),
                 ],
@@ -122,7 +125,7 @@ class ResultView extends GetView<ResultController> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              '+${r.coinsEarned} coins',
+                              'coins_added'.trParams({'n': '${r.coinsEarned}'}),
                               style: const TextStyle(
                                 fontWeight: FontWeight.w900,
                                 fontSize: 17,
@@ -131,8 +134,8 @@ class ResultView extends GetView<ResultController> {
                             Obx(
                               () => Text(
                                 controller.doubled.value
-                                    ? 'Doubled! Added to your balance'
-                                    : 'Added to your balance',
+                                    ? 'doubled_msg'.tr
+                                    : 'added_balance'.tr,
                                 style: theme.textTheme.bodySmall,
                               ),
                             ),
@@ -142,15 +145,14 @@ class ResultView extends GetView<ResultController> {
                       Obx(
                         () => controller.canDouble
                             ? FilledButton.tonalIcon(
-                                onPressed: controller.doubling.value ||
-                                        !controller.rewardedReady.value
+                                onPressed: controller.doubling.value
                                     ? null
                                     : () async {
                                         final ok = await controller.doubleCoins();
                                         if (!ok) {
                                           Get.snackbar(
-                                            'Ad',
-                                            'Ad not available right now.',
+                                            'ok'.tr,
+                                            'ad_unavailable'.tr,
                                             snackPosition: SnackPosition.BOTTOM,
                                           );
                                         }
@@ -182,12 +184,14 @@ class ResultView extends GetView<ResultController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Achievement: ${a.title}',
+                                'achievement_unlocked'.trParams({'t': 'ach_${a.id}_t'.tr}),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
-                              Text('${a.description}  +${a.rewardCoins} coins'),
+                              Text(
+                                  '${'ach_${a.id}_d'.tr}  ${'coins_added'.trParams({'n': '${a.rewardCoins}'})}',
+                                ),
                             ],
                           ),
                         ),
@@ -195,10 +199,49 @@ class ResultView extends GetView<ResultController> {
                     ),
                   ).animate().fadeIn(delay: 600.ms).slideX(begin: 0.2),
                 ),
+              if (r.mode == PuzzleMode.daily)
+                Obx(() {
+                  final place = controller.boardPlace.value;
+                  if (place == null) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 10),
+                    child: SoftCard(
+                      borderColor: AppColors.green,
+                      onTap: () {
+                        Get.find<HomeController>().tab.value = 1;
+                        Get.until((route) => route.settings.name == Routes.home);
+                      },
+                      child: Row(
+                        children: [
+                          const Icon(Icons.leaderboard_rounded,
+                              color: AppColors.green, size: 30),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'board_your_place'
+                                      .trParams({'n': '$place'}),
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                Text('see_board'.tr),
+                              ],
+                            ),
+                          ),
+                          const Icon(Icons.chevron_right_rounded),
+                        ],
+                      ),
+                    ),
+                  );
+                }),
               if (r.closestWords.isNotEmpty) ...[
                 const SizedBox(height: 22),
                 Text(
-                  'Words nearest to ${r.secretWord}',
+                  'nearest_words'.trParams({'w': r.secretWord}),
                   style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: 10),
@@ -236,17 +279,17 @@ class ResultView extends GetView<ResultController> {
               OutlinedButton.icon(
                 onPressed: controller.share,
                 icon: const Icon(Icons.ios_share_rounded),
-                label: const Text('Share result'),
+                label: Text('share_result'.tr),
               ),
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: controller.nextPuzzle,
-                child: Text(controller.nextLabel),
+                child: Text(controller.nextLabel.$1.trParams(controller.nextLabel.$2)),
               ),
               const SizedBox(height: 4),
               TextButton(
                 onPressed: controller.goHome,
-                child: const Text('Back'),
+                child: Text('back'.tr),
               ),
             ],
           ),

@@ -8,12 +8,16 @@ import '../../data/models/category.dart';
 import '../../data/models/puzzle.dart';
 import '../constants/app_constants.dart';
 
-/// One candidate answer word with its difficulty tier.
+/// One candidate answer word with its difficulty in each word set
+/// (null = the word is not used in that set).
 class SecretWord {
-  const SecretWord(this.word, this.difficulty);
+  const SecretWord(this.word, this.regular, this.india);
 
   final String word;
-  final Difficulty difficulty;
+  final Difficulty? regular;
+  final Difficulty? india;
+
+  Difficulty? tierIn(WordSet set) => set == WordSet.regular ? regular : india;
 }
 
 /// Ranking of the whole vocabulary against one secret word.
@@ -31,7 +35,7 @@ class Ranking {
 
 /// Real semantic ranking on device.
 ///
-/// Loads a GloVe-derived vocabulary (40k words, 100 dims, int8 quantised and
+/// Loads a GloVe-derived vocabulary (100k words, 100 dims, int8 quantised and
 /// L2-normalised by tools/build_embeddings.py) and ranks every word by cosine
 /// similarity to the secret - the same idea as Contexto, fully offline.
 class SemanticEngine extends GetxService {
@@ -45,6 +49,7 @@ class SemanticEngine extends GetxService {
   late final int dim;
   late final List<SecretWord> secrets;
   late final Map<String, SecretWord> secretByWord;
+  final Map<String, List<String>> _poolCache = {};
   late final List<Category> categories;
   late final Map<String, List<String>> categoryWords;
 
@@ -68,15 +73,19 @@ class SemanticEngine extends GetxService {
     final secretLines = const LineSplitter().convert(
       await _bundle.loadString('$dir/secrets.txt'),
     );
+    Difficulty? tier(String t) => switch (t) {
+      '0' => Difficulty.easy,
+      '1' => Difficulty.medium,
+      '2' => Difficulty.hard,
+      _ => null,
+    };
     secrets = [
       for (final line in secretLines)
-        if (line.contains(','))
+        if (line.split(',').length == 3)
           SecretWord(
             line.split(',')[0],
-            Difficulty.values.firstWhere(
-              (d) => d.name == line.split(',')[1],
-              orElse: () => Difficulty.medium,
-            ),
+            tier(line.split(',')[1]),
+            tier(line.split(',')[2]),
           ),
     ];
     secretByWord = {for (final s in secrets) s.word: s};
@@ -97,6 +106,41 @@ class SemanticEngine extends GetxService {
   }
 
   bool contains(String word) => index.containsKey(word);
+
+  /// Answer words for a word set and level, most common first. Never empty:
+  /// if a (rare) combination has too few words the neighbouring levels are
+  /// added.
+  List<String> pool(WordSet set, Difficulty level) {
+    return _poolCache.putIfAbsent('${set.code}${level.code}', () {
+      List<String> only(Set<Difficulty> tiers) => [
+            for (final s in secrets)
+              if (tiers.contains(s.tierIn(set))) s.word,
+          ];
+      var words = only({level});
+      if (words.length < 150) {
+        words = only(switch (level) {
+          Difficulty.easy => {Difficulty.easy, Difficulty.medium},
+          Difficulty.medium => Difficulty.values.toSet(),
+          Difficulty.hard => {Difficulty.medium, Difficulty.hard},
+        });
+      }
+      return words;
+    });
+  }
+
+  /// Answer words of a category for a word set and level (falls back to the
+  /// whole category when the filtered list is too small).
+  List<String> categoryPool(String categoryId, WordSet set, Difficulty level) {
+    final all = categoryWords[categoryId] ?? const <String>[];
+    final tier = pool(set, level).toSet();
+    final filtered = [for (final w in all) if (tier.contains(w)) w];
+    if (filtered.length >= 40) return filtered;
+    final anyLevel = [
+      for (final w in all)
+        if (secretByWord[w]?.tierIn(set) != null) w,
+    ];
+    return anyLevel.length >= 40 ? anyLevel : all;
+  }
 
   /// Ranks the whole vocabulary against [secret] (must be in the vocabulary).
   Ranking rank(String secret) {

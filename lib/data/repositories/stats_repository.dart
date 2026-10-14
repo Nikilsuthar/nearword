@@ -78,7 +78,9 @@ class StatsRepository extends GetxService {
   }) {
     var earned = 0;
     stats.gamesPlayed++;
-    if (mode == PuzzleMode.battle) stats.battlesPlayed++;
+    if (mode == PuzzleMode.battle || mode == PuzzleMode.challenge) {
+      stats.battlesPlayed++;
+    }
 
     if (won) {
       stats.wins++;
@@ -87,7 +89,10 @@ class StatsRepository extends GetxService {
       stats.distribution[bucket] = (stats.distribution[bucket] ?? 0) + 1;
       if (mode == PuzzleMode.category) stats.winCategories.add(categoryId);
       if (mode == PuzzleMode.daily) stats.dailyWins++;
-      if (mode == PuzzleMode.battle && battleWinner) stats.battleWins++;
+      if ((mode == PuzzleMode.battle || mode == PuzzleMode.challenge) &&
+          battleWinner) {
+        stats.battleWins++;
+      }
       if (stats.bestGuessCount == null || guessCount < stats.bestGuessCount!) {
         stats.bestGuessCount = guessCount;
       }
@@ -110,9 +115,6 @@ class StatsRepository extends GetxService {
 
       earned += winReward(difficulty, guessCount);
       if (mode == PuzzleMode.daily) earned += AppConstants.dailyWinBonusCoins;
-      if (mode == PuzzleMode.battle && battleWinner) {
-        earned += AppConstants.battleWinBonusCoins;
-      }
       stats.coins += earned;
     }
 

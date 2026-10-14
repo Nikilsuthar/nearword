@@ -1,0 +1,27 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+    "rooms": {
+      "$code": {
+        ".read": "auth != null",
+        ".write": "auth != null",
+        ".validate": "$code.matches(/^[A-Z0-9]{5}$/)"
+      }
+    },
+    "daily": {
+      "$day": {
+        "$tier": {
+          ".read": "auth != null",
+          ".indexOn": [
+            "score"
+          ],
+          "$pid": {
+            ".write": "auth != null && auth.uid === $pid",
+            ".validate": "newData.hasChildren(['name', 'score', 'guesses']) && newData.child('name').isString() && newData.child('name').val().length <= 20 && newData.child('score').isNumber()"
+          }
+        }
+      }
+    }
+  }
+}

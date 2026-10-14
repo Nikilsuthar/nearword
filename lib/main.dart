@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import 'core/constants/app_constants.dart';
 import 'core/theme/app_theme.dart';
+import 'l10n/app_translations.dart';
 import 'routes/app_pages.dart';
 
 void main() {
@@ -23,6 +24,10 @@ class NearWordApp extends StatelessWidget {
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.dark,
+      translations: AppTranslations(),
+      locale: AppTranslations.fallback,
+      fallbackLocale: AppTranslations.fallback,
+      supportedLocales: AppTranslations.supported,
       initialRoute: AppPages.initial,
       getPages: AppPages.pages,
       defaultTransition: Transition.cupertino,

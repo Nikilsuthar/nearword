@@ -1,9 +1,7 @@
 import 'package:get/get.dart';
 
-import '../features/battle/battle_binding.dart';
-import '../features/battle/views/battle_hub_view.dart';
-import '../features/battle/views/battle_result_view.dart';
-import '../features/battle/views/battle_room_view.dart';
+import '../features/battle/views/room_result_view.dart';
+import '../features/battle/views/room_view.dart';
 import '../features/categories/categories_binding.dart';
 import '../features/categories/categories_view.dart';
 import '../features/game/game_binding.dart';
@@ -13,10 +11,9 @@ import '../features/home/home_view.dart';
 import '../features/result/result_binding.dart';
 import '../features/result/result_view.dart';
 import '../features/settings/settings_view.dart';
+import '../features/setup/setup_view.dart';
 import '../features/splash/splash_binding.dart';
 import '../features/splash/splash_view.dart';
-import '../features/stats/stats_binding.dart';
-import '../features/stats/stats_view.dart';
 import 'app_routes.dart';
 
 class AppPages {
@@ -29,6 +26,11 @@ class AppPages {
       name: Routes.splash,
       page: () => const SplashView(),
       binding: SplashBinding(),
+    ),
+    GetPage(
+      name: Routes.setup,
+      page: () => const SetupView(),
+      transition: Transition.fadeIn,
     ),
     GetPage(
       name: Routes.home,
@@ -53,25 +55,15 @@ class AppPages {
       binding: ResultBinding(),
       transition: Transition.fadeIn,
     ),
-    GetPage(
-      name: Routes.stats,
-      page: () => const StatsView(),
-      binding: StatsBinding(),
-    ),
     GetPage(name: Routes.settings, page: () => const SettingsView()),
     GetPage(
-      name: Routes.battle,
-      page: () => const BattleHubView(),
-      binding: BattleBinding(),
-    ),
-    GetPage(
-      name: Routes.battleRoom,
-      page: () => const BattleRoomView(),
+      name: Routes.room,
+      page: () => const RoomView(),
       transition: Transition.fadeIn,
     ),
     GetPage(
-      name: Routes.battleResult,
-      page: () => const BattleResultView(),
+      name: Routes.roomResult,
+      page: () => const RoomResultView(),
       transition: Transition.fadeIn,
     ),
   ];

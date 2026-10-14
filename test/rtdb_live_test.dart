@@ -5,6 +5,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:http/http.dart' as http;
+import 'package:nearword/core/services/rtdb_client.dart';
 import 'package:nearword/core/utils/seeded.dart';
 import 'package:nearword/data/models/battle.dart';
 import 'package:nearword/features/battle/battle_backend.dart';
@@ -16,11 +17,11 @@ void main() {
 
   test('two players race through a real database', () async {
     final host = RtdbBattleBackend(
-      url!,
+      RtdbClient(url!),
       pollInterval: const Duration(milliseconds: 300),
     );
     final guest = RtdbBattleBackend(
-      url,
+      RtdbClient(url),
       pollInterval: const Duration(milliseconds: 300),
     );
     final code = Seeded.randomCode(5);
@@ -95,7 +96,7 @@ void main() {
       host.dispose();
       guest.dispose();
     }
-    expect(await RtdbBattleBackend(url).fetchRoom(code), isNull);
+    expect(await RtdbBattleBackend(RtdbClient(url)).fetchRoom(code), isNull);
   }, skip: skip);
 
   test('rules block junk: bad room codes and root access', () async {

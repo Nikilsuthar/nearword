@@ -26,33 +26,31 @@ class HowToPlaySheet extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('How to play', style: text.headlineMedium),
+            Text('how_title'.tr, style: text.headlineMedium),
             const SizedBox(height: 6),
             Text(
-              'A secret word is hidden. Every word you try gets a rank: how '
-              'close its MEANING is to the secret. Rank 1 is the secret.',
+              'how_intro'.tr,
               style: text.bodyLarge,
             ),
             const SizedBox(height: 18),
-            const _Step(
+            _Step(
               color: AppColors.green,
-              title: 'Green  ·  rank 1 – 300',
-              body: 'Very close in meaning. You are on the right track.',
+              title: 'how_green'.tr,
+              body: 'how_green_sub'.tr,
             ),
-            const _Step(
+            _Step(
               color: AppColors.yellow,
-              title: 'Yellow  ·  rank 301 – 1,500',
-              body: 'Same general area, but not quite there.',
+              title: 'how_yellow'.tr,
+              body: 'how_yellow_sub'.tr,
             ),
-            const _Step(
+            _Step(
               color: AppColors.red,
-              title: 'Red  ·  above 1,500',
-              body: 'Far away. Try a different idea.',
+              title: 'how_red'.tr,
+              body: 'how_red_sub'.tr,
             ),
             const SizedBox(height: 12),
             Text(
-              'Tip: think about categories, uses and things that appear '
-              'together, not spelling. "ocean" is closer to "sea" than "ocelot".',
+              'how_tip'.tr,
               style: text.bodyMedium?.copyWith(
                 color: text.bodyMedium?.color?.withValues(alpha: 0.75),
               ),
@@ -62,7 +60,7 @@ class HowToPlaySheet extends StatelessWidget {
               width: double.infinity,
               child: FilledButton(
                 onPressed: Get.back,
-                child: const Text("Let's play"),
+                child: Text('how_go'.tr),
               ),
             ),
           ],

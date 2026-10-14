@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/guess.dart';
@@ -31,8 +32,7 @@ class LatestCard extends StatelessWidget {
             const SizedBox(width: 14),
             Expanded(
               child: Text(
-                'Type any word. The lower its rank, the closer it is to the '
-                'secret word in meaning.',
+                'game_empty_hint'.tr,
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   color: scheme.onSurface.withValues(alpha: 0.8),
@@ -45,7 +45,8 @@ class LatestCard extends StatelessWidget {
     }
 
     final color = AppColors.forRank(g.rank);
-    final (label, emoji) = AppColors.temperature(g.rank);
+    final (labelKey, emoji) = AppColors.temperature(g.rank);
+    final label = labelKey.tr;
     return Container(
       key: ValueKey('latest-${g.word}'),
       width: double.infinity,

@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/widgets.dart' show Locale;
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
 import 'package:hive/hive.dart';
@@ -12,6 +14,7 @@ import 'package:nearword/data/repositories/puzzle_repository.dart';
 import 'package:nearword/data/repositories/stats_repository.dart';
 import 'package:nearword/features/game/game_controller.dart';
 import 'package:nearword/features/hints/hint_engine.dart';
+import 'package:nearword/l10n/app_translations.dart';
 
 /// Engine with a tiny hand-made ranking so the tests are deterministic.
 class _FakeEngine extends SemanticEngine {
@@ -35,10 +38,12 @@ class _FakeRepo extends PuzzleRepository {
   _FakeRepo(super.engine);
 
   static const puzzle = Puzzle(
-    id: 'rnd-TEST01',
+    id: 'rnd-rm-TEST01',
     mode: PuzzleMode.random,
     category: 'random',
     difficulty: Difficulty.easy,
+    level: Difficulty.easy,
+    wordSet: WordSet.regular,
     secret: 'dog',
   );
 
@@ -57,7 +62,7 @@ void main() {
 
   Future<GameController> makeController() async {
     final ctrl = GameController(
-      initialPuzzleId: 'rnd-TEST01',
+      initialPuzzleId: 'rnd-rm-TEST01',
       repository: _FakeRepo(_FakeEngine()),
       engine: _FakeEngine(),
       storage: storage,
@@ -65,11 +70,13 @@ void main() {
       onFinished: (r) => finished = r,
       resultDelay: Duration.zero,
     );
-    await ctrl.loadPuzzle('rnd-TEST01');
+    await ctrl.loadPuzzle('rnd-rm-TEST01');
     return ctrl;
   }
 
   setUp(() async {
+    Get.addTranslations(AppTranslations().keys);
+    Get.locale = const Locale('en');
     tmp = await Directory.systemTemp.createTemp('nearword_test');
     Hive.init(tmp.path);
     storage = await StorageService().init(useFlutter: false);

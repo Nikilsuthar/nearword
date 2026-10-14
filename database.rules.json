@@ -6,10 +6,17 @@
       "$code": {
         ".read": true,
         ".write": true,
-        ".validate": "$code.matches(/^[A-Z0-9]{5}$/)",
-        "players": {
+        ".validate": "$code.matches(/^[A-Z0-9]{5}$/)"
+      }
+    },
+    "daily": {
+      "$day": {
+        "$tier": {
+          ".read": true,
+          ".indexOn": ["score"],
           "$pid": {
-            ".validate": "newData.hasChildren(['name', 'best', 'guesses'])"
+            ".write": true,
+            ".validate": "newData.hasChildren(['name', 'score', 'guesses']) && newData.child('name').isString() && newData.child('name').val().length <= 20 && newData.child('score').isNumber()"
           }
         }
       }

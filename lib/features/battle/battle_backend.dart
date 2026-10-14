@@ -1,12 +1,11 @@
 import 'dart:async';
-import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart' as http;
 
+import '../../core/services/rtdb_client.dart';
 import '../../data/models/battle.dart';
 
-/// Storage + sync for battle rooms. Two implementations:
+/// Storage + sync for rooms. Two implementations:
 ///  * [RtdbBattleBackend] - Firebase Realtime Database over REST (online).
 ///  * [MemoryBattleBackend] - in-process (practice mode vs bots, and tests).
 abstract class BattleBackend {
@@ -20,6 +19,7 @@ abstract class BattleBackend {
   Future<void> savePlayer(String code, BattlePlayer player);
   Future<void> removePlayer(String code, String playerId);
   Future<void> patchRoom(String code, Map<String, dynamic> fields);
+  Future<void> deleteRoom(String code);
 
   /// Emits the room whenever it changes (null if it disappears).
   Stream<BattleRoom?> watchRoom(String code);
@@ -78,6 +78,12 @@ class MemoryBattleBackend implements BattleBackend {
   }
 
   @override
+  Future<void> deleteRoom(String code) async {
+    _rooms.remove(code);
+    _emit(code);
+  }
+
+  @override
   Stream<BattleRoom?> watchRoom(String code) {
     final source = _streams.putIfAbsent(
       code,
@@ -114,52 +120,25 @@ class MemoryBattleBackend implements BattleBackend {
 /// google-services.json needed, just the database URL.
 class RtdbBattleBackend implements BattleBackend {
   RtdbBattleBackend(
-    String databaseUrl, {
-    http.Client? client,
+    RtdbClient client, {
     this.pollInterval = const Duration(milliseconds: 1200),
-  })  : _base = databaseUrl.trim().replaceAll(RegExp(r'/+$'), ''),
-        _client = client ?? http.Client();
+  }) : _db = client;
 
-  final String _base;
-  final http.Client _client;
+  final RtdbClient _db;
   final Duration pollInterval;
-  static const _timeout = Duration(seconds: 8);
 
   @override
   bool get isOnline => true;
 
-  Uri _uri(String path) => Uri.parse('$_base/rooms/$path.json');
-
-  Future<dynamic> _get(String path) async {
-    final res = await _client.get(_uri(path)).timeout(_timeout);
-    if (res.statusCode != 200) {
-      throw http.ClientException('GET $path -> ${res.statusCode}');
-    }
-    return jsonDecode(res.body);
-  }
-
-  Future<void> _send(String method, String path, Object body) async {
-    final req = http.Request(method, _uri(path))
-      ..headers['Content-Type'] = 'application/json'
-      ..body = jsonEncode(body);
-    final res = await http.Response.fromStream(
-      await _client.send(req).timeout(_timeout),
-    );
-    if (res.statusCode != 200) {
-      throw http.ClientException('$method $path -> ${res.statusCode}');
-    }
-  }
-
   @override
   Future<BattleRoom?> fetchRoom(String code) async {
-    final data = await _get(code);
+    final data = await _db.get('rooms/$code');
     return data is Map ? BattleRoom.fromJson(code, data) : null;
   }
 
   @override
-  Future<void> createRoom(BattleRoom room, BattlePlayer host) => _send(
-        'PUT',
-        room.code,
+  Future<void> createRoom(BattleRoom room, BattlePlayer host) => _db.put(
+        'rooms/${room.code}',
         {
           ...room.toJson(),
           'players': {host.id: host.toJson()},
@@ -168,21 +147,18 @@ class RtdbBattleBackend implements BattleBackend {
 
   @override
   Future<void> savePlayer(String code, BattlePlayer player) =>
-      _send('PUT', '$code/players/${player.id}', player.toJson());
+      _db.put('rooms/$code/players/${player.id}', player.toJson());
 
   @override
-  Future<void> removePlayer(String code, String playerId) async {
-    final res = await _client
-        .delete(_uri('$code/players/$playerId'))
-        .timeout(_timeout);
-    if (res.statusCode != 200) {
-      throw http.ClientException('DELETE -> ${res.statusCode}');
-    }
-  }
+  Future<void> removePlayer(String code, String playerId) =>
+      _db.delete('rooms/$code/players/$playerId');
 
   @override
   Future<void> patchRoom(String code, Map<String, dynamic> fields) =>
-      _send('PATCH', code, fields);
+      _db.patch('rooms/$code', fields);
+
+  @override
+  Future<void> deleteRoom(String code) => _db.delete('rooms/$code');
 
   @override
   Stream<BattleRoom?> watchRoom(String code) {
@@ -192,14 +168,14 @@ class RtdbBattleBackend implements BattleBackend {
 
     Future<void> poll() async {
       try {
-        final raw = await _get(code);
-        final encoded = jsonEncode(raw);
+        final raw = await _db.get('rooms/$code');
+        final encoded = raw?.toString();
         if (encoded != last && !controller.isClosed) {
           last = encoded;
           controller.add(raw is Map ? BattleRoom.fromJson(code, raw) : null);
         }
       } catch (e, st) {
-        debugPrint('Battle poll failed: $e');
+        debugPrint('Room poll failed: $e');
         if (!controller.isClosed) controller.addError(e, st);
       }
     }
@@ -218,5 +194,5 @@ class RtdbBattleBackend implements BattleBackend {
   }
 
   @override
-  void dispose() => _client.close();
+  void dispose() => _db.close();
 }

@@ -1,9 +1,13 @@
-
+// End-to-end widget tests: boot the real services (real GloVe data) and drive
+// every screen. Any GetX / framework exception thrown while building fails the
+// test, so this guards against the "improper use of GetX" class of bugs.
+// Online features run against a mock Firebase server on localhost.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
-import 'package:nearword/core/services/semantic_engine.dart';
+import 'package:nearword/data/models/puzzle.dart';
 import 'package:nearword/features/battle/battle_controller.dart';
+import 'package:nearword/routes/app_routes.dart';
 
 import 'support/harness.dart';
 
@@ -15,48 +19,102 @@ void main() {
     final tag = mode.name;
 
     group('[$tag] app flow', () {
-      testWidgets('home shows all modes and no errors', (t) async {
+      testWidgets('home shows hero, modes and the four tabs', (t) async {
         await boot(t, mode: mode);
-        expect(find.text('NearWord'), findsNothing); // wordmark is two Texts
+        expect(find.text("Find today's word"), findsOneWidget);
+        expect(find.text('Play today'), findsOneWidget);
+        expect(find.text('Regular · Medium'), findsWidgets);
         expect(find.text('Quick play'), findsOneWidget);
         expect(find.text('Categories'), findsOneWidget);
-        expect(find.text('Battle'), findsOneWidget);
+        expect(find.text('Live battle'), findsOneWidget);
         expect(find.text('Challenge'), findsOneWidget);
-        expect(find.textContaining('DAILY'), findsOneWidget);
+        expect(find.text('Hi, Tester'), findsOneWidget);
+        noErrors(t);
+
+        await openTab(t, 'Rank');
+        expect(find.text('Daily board'), findsOneWidget);
+        expect(find.text('The online board is not set up yet.'), findsOneWidget);
+        noErrors(t);
+
+        await openTab(t, 'Friends');
+        expect(find.text('Play with friends'), findsOneWidget);
+        expect(find.text('Create room'), findsOneWidget);
+        expect(find.text('Create challenge'), findsOneWidget);
+        expect(find.text('Practice vs bots'), findsOneWidget);
+        noErrors(t);
+
+        await openTab(t, 'Me');
+        expect(find.text('Stats'), findsOneWidget);
+        expect(find.text('Achievements'), findsOneWidget);
+        noErrors(t);
+
+        await openTab(t, 'Home');
+        // Tiles for battle / challenge jump to the Friends tab.
+        await tapText(t, 'Challenge');
+        expect(find.text('Play with friends'), findsOneWidget);
         noErrors(t);
       });
 
-      testWidgets('settings, stats, how-to-play open and close', (t) async {
+      testWidgets('first launch setup: language, style, level, nickname',
+          (t) async {
+        await boot(t,
+            mode: mode,
+            setupDone: false,
+            nickname: '',
+            initialRoute: Routes.setup);
+        expect(find.text("Let's set up your game"), findsOneWidget);
+        await tapText(t, 'India');
+        await tapText(t, 'Easy');
+        await t.enterText(find.byType(TextField), 'Ravi');
+        await tapText(t, 'Start playing');
+        await pump(t, 800);
+        expect(find.text('Hi, Ravi'), findsOneWidget);
+        expect(find.text('India · Easy'), findsWidgets);
+        expect(settings.wordSet.value, WordSet.india);
+        expect(settings.level.value, Difficulty.easy);
+        expect(settings.setupDone.value, isTrue);
+        noErrors(t);
+      });
+
+      testWidgets('settings: level, style, language (Hindi) and theme',
+          (t) async {
         await boot(t, mode: mode);
-        await t.tap(find.byIcon(Icons.settings_rounded));
-        await pump(t);
-        expect(find.text('Settings'), findsOneWidget);
-        // Theme switch + haptics toggle.
+        await openTab(t, 'Me');
+        await tapText(t, 'Settings');
+        expect(find.text('Settings'), findsWidgets);
+        await tapText(t, 'Hard');
+        await tapText(t, 'India');
+        expect(settings.level.value, Difficulty.hard);
+        expect(settings.wordSet.value, WordSet.india);
+        // Theme + haptics.
         await tapText(t, 'Light');
         await tapText(t, 'Dark');
         await tapText(t, 'Auto');
+        await tapText(t, 'Dark');
         await t.tap(find.byType(Switch));
         await pump(t);
         expect(settings.haptics.value, isFalse);
-        await tapText(t, 'How to play');
-        expect(find.text("Let's play"), findsOneWidget);
-        await tapText(t, "Let's play");
-        await back(t);
 
-        await tapText(t, 'Played');
-        expect(find.text('Stats'), findsOneWidget);
-        expect(find.text('Achievements'), findsOneWidget);
+        // Hindi and back.
+        await tapText(t, 'हिंदी');
+        await pump(t, 600);
+        expect(settings.language.value, 'hi');
+        expect(find.text('सेटिंग्स'), findsWidgets);
+        noErrors(t);
+        await tapText(t, 'English');
+        expect(settings.language.value, 'en');
         await back(t);
+        await openTab(t, 'Home');
+        expect(find.text('India · Hard'), findsWidgets);
         noErrors(t);
       });
 
-      testWidgets('daily: guesses, duplicate, unknown, radar, hints', (t) async {
+      testWidgets('daily: guesses, duplicate, unknown, radar, hints',
+          (t) async {
         await boot(t, mode: mode);
         await tapText(t, 'Play today');
         await pump(t, 800);
-        expect(find.text('Type any word. The lower its rank, the closer it '
-            'is to the secret word in meaning.'), findsOneWidget);
-
+        expect(find.text('Daily #286'), findsOneWidget);
         await guess(t, 'house');
         await guess(t, 'water');
         await guess(t, 'zzzzqq');
@@ -66,13 +124,12 @@ void main() {
         await guess(t, '   ');
         noErrors(t);
 
-        // Radar toggle and back.
         await tapText(t, 'Radar');
         await pump(t, 400);
         await tapText(t, 'List');
 
-        // Hints: open the sheet repeatedly, use a free-of-coins path (none in
-        // test) and the "not enough coins" path.
+        // Hints: open repeatedly; the coin path says "not enough coins".
+        stats.stats.coins = 0;
         for (var i = 0; i < 3; i++) {
           await t.tap(find.byIcon(Icons.lightbulb_outline_rounded));
           await pump(t, 600);
@@ -80,41 +137,37 @@ void main() {
           await t.tap(find.textContaining('Use ·').first);
           await pump(t, 500);
           expect(find.textContaining('Not enough coins'), findsOneWidget);
-          await pump(t, 4000); // snackbar goes away
-          Get.back<void>(); // close the sheet
+          await pump(t, 4000);
+          Get.back<void>();
           await pump(t, 500);
         }
         noErrors(t);
 
-        // Paid hints with coins.
         stats.addCoins(200);
         final before = stats.stats.coins;
-        await t.tap(find.byIcon(Icons.lightbulb_outline_rounded));
-        await pump(t, 600);
-        await t.tap(find.textContaining('Use · 10 coins')); // word length
-        await pump(t, 600);
-        expect(find.textContaining('letters'), findsOneWidget);
-        await t.tap(find.byIcon(Icons.lightbulb_outline_rounded));
-        await pump(t, 600);
-        await t.tap(find.textContaining('Use · 15 coins')); // first letter
-        await pump(t, 600);
-        expect(find.textContaining('Starts with'), findsOneWidget);
-        await t.tap(find.byIcon(Icons.lightbulb_outline_rounded));
-        await pump(t, 600);
-        await t.tap(find.textContaining('Use · 30 coins')); // closer word
-        await pump(t, 600);
+        for (final (cost, check) in [
+          (10, 'letters'),
+          (15, 'Starts with'),
+          (30, null),
+        ]) {
+          await t.tap(find.byIcon(Icons.lightbulb_outline_rounded));
+          await pump(t, 600);
+          await t.tap(find.textContaining('Use · $cost coins'));
+          await pump(t, 600);
+          if (check != null) expect(find.textContaining(check), findsOneWidget);
+        }
         expect(stats.stats.coins, before - 10 - 15 - 30);
         noErrors(t);
       });
 
-      testWidgets('daily: win shows result, reopen result, next puzzle',
+      testWidgets('daily win: result, next puzzle, reopen without re-reward',
           (t) async {
         await boot(t, mode: mode);
         await tapText(t, 'Play today');
         await pump(t, 800);
         await guess(t, 'house');
         await guess(t, dailySecret);
-        await pump(t, 2500); // result delay + transition
+        await pump(t, 2500);
         expect(find.text('You found it!'), findsOneWidget);
         expect(find.text(dailySecret.toUpperCase()), findsOneWidget);
         expect(stats.stats.wins, 1);
@@ -124,24 +177,17 @@ void main() {
         await t.scrollUntilVisible(find.textContaining('Words nearest to'), 200,
             scrollable: find.byType(Scrollable).first);
         expect(find.textContaining('Words nearest to'), findsOneWidget);
-
-        // Share path.
         await t.scrollUntilVisible(find.text('Share result'), 200,
             scrollable: find.byType(Scrollable).first);
         await tapText(t, 'Share result');
-        await pump(t, 300);
         noErrors(t);
 
-        // Next puzzle -> new quick game.
-        await t.scrollUntilVisible(find.text('Play a quick puzzle'), 200,
-            scrollable: find.byType(Scrollable).first);
         await tapText(t, 'Play a quick puzzle');
         await pump(t, 800);
         expect(find.text('Quick play'), findsOneWidget);
-        await back(t); // game -> home
+        await back(t);
         noErrors(t);
 
-        // Home now shows the solved state; reopen the finished result.
         await io(t);
         expect(find.textContaining('Solved in'), findsOneWidget);
         await tapText(t, 'View result');
@@ -180,25 +226,21 @@ void main() {
         expect(find.text('Animals'), findsOneWidget);
         noErrors(t);
 
-        // Locked category -> dialog (not enough coins) -> cancel.
         await tapText(t, 'Jobs');
         expect(find.textContaining('Unlock Jobs'), findsOneWidget);
         expect(find.textContaining('You need 100 coins'), findsOneWidget);
         await tapText(t, 'Cancel');
 
-        // Enough coins -> unlock -> playable.
         stats.addCoins(150);
         await tapText(t, 'Jobs');
         await tapText(t, 'Unlock (100)');
-        await pump(t, 4500); // let the snackbar leave
+        await pump(t, 4500);
         expect(stats.stats.unlockedCategories, contains('jobs'));
         await tapText(t, 'Jobs');
         await pump(t, 800);
-        expect(find.text('Jobs'), findsWidgets);
         await guess(t, 'doctor');
         noErrors(t);
 
-        // Unlocked category from the grid: Animals.
         await back(t);
         await tapText(t, 'Animals');
         await pump(t, 800);
@@ -206,56 +248,36 @@ void main() {
         noErrors(t);
       });
 
-      testWidgets('challenge: bad code, empty code, valid code, same word',
+      testWidgets('friends: join errors and the "online needed" hint',
           (t) async {
         await boot(t, mode: mode);
-        await tapText(t, 'Challenge');
-        await tapText(t, 'Play code'); // empty
-        expect(find.text('That code is not valid.'), findsOneWidget);
-        await t.enterText(find.byType(TextField), 'AB1');
-        await tapText(t, 'Play code');
-        expect(find.text('That code is not valid.'), findsOneWidget);
-        await t.enterText(find.byType(TextField), 'abc123');
-        await tapText(t, 'Play code');
-        await pump(t, 900);
-        expect(find.text('Quick play'), findsOneWidget);
-        await guess(t, 'water');
-        final rank = Get.find<SemanticEngine>()
-            .rank(repo.puzzleById('rnd-ABC123')!.secret)
-            .byWord['water'];
-        expect(find.text('$rank'), findsWidgets);
-        await back(t);
-
-        // Create & share path.
-        await tapText(t, 'Challenge');
-        await tapText(t, 'Create & share a challenge');
-        await pump(t, 800);
-        expect(find.text('Quick play'), findsOneWidget);
+        await openTab(t, 'Friends');
+        await tapText(t, 'Create room');
+        expect(
+          find.textContaining('Online play needs the server URL'),
+          findsOneWidget,
+        );
+        await t.enterText(find.byType(TextField).first, 'ABCDE');
+        await tapText(t, 'Join');
+        expect(
+          find.textContaining('Online play needs the server URL'),
+          findsOneWidget,
+        );
         noErrors(t);
       });
 
-      testWidgets('battle: validation, practice round, results', (t) async {
+      testWidgets('friends: practice battle round, leave, results',
+          (t) async {
         await boot(t, mode: mode);
-        await tapText(t, 'Battle');
-        expect(find.text('Word battle'), findsOneWidget);
-
-        // Online features are off without a backend URL.
-        await tapText(t, 'Create online room');
-        expect(find.textContaining('Firebase'), findsWidgets);
-        await t.enterText(find.widgetWithText(TextField, 'ROOM CODE'), 'ABCDE');
-        await tapText(t, 'Join');
-        noErrors(t);
-
-        // Practice battle.
-        await tapText(t, '2 min');
+        await openTab(t, 'Friends');
         await tapText(t, 'Practice vs bots');
         await pump(t, 800);
         expect(find.text('Lobby'), findsOneWidget);
         expect(find.textContaining('Tester'), findsOneWidget);
         await tapText(t, 'Start battle');
         expect(find.text('Get ready!'), findsOneWidget);
-        await pump(t, 6500); // countdown
-        expect(find.text('Battle'), findsWidgets);
+        await pump(t, 6500);
+        expect(find.text('Live battle'), findsWidgets);
         noErrors(t);
 
         await guess(t, 'house');
@@ -263,12 +285,11 @@ void main() {
         await pump(t, 4000);
         noErrors(t);
 
-        // Leave with the back button -> confirm -> result.
         final battle = Get.find<BattleController>();
         expect(battle.standings.length, 4);
         await t.binding.handlePopRoute();
         await pump(t, 500);
-        expect(find.text('Leave the battle?'), findsOneWidget);
+        expect(find.text('Leave the room?'), findsOneWidget);
         await tapText(t, 'Keep playing');
         await t.binding.handlePopRoute();
         await pump(t, 500);
@@ -278,17 +299,16 @@ void main() {
         expect(find.textContaining('Tester (you)'), findsOneWidget);
         noErrors(t);
 
-        await tapText(t, 'Back to battle lobby');
-        await pump(t, 1500);
-        expect(find.text('Word battle'), findsOneWidget);
-        await back(t);
+        await tapText(t, 'Back to friends');
+        await pump(t, 800);
+        expect(find.text('Play with friends'), findsOneWidget);
         noErrors(t);
       });
 
-      testWidgets('battle: winning and timeout end the round', (t) async {
+      testWidgets('friends: winning a practice battle ends the round',
+          (t) async {
         await boot(t, mode: mode);
-        await tapText(t, 'Battle');
-        await tapText(t, '2 min');
+        await openTab(t, 'Friends');
         await tapText(t, 'Practice vs bots');
         await pump(t, 800);
         final battle = Get.find<BattleController>();
@@ -299,13 +319,14 @@ void main() {
         await pump(t, 2500);
         expect(find.text('Round in progress…'), findsOneWidget);
         expect(battle.myPlace, 1);
-        // The round closes 30 s later (grace period) -> final ranking.
+        // The round closes 30 s after the first solve -> final ranking.
         await pump(t, 32000);
-        expect(find.text('You won the battle!'), findsOneWidget);
+        expect(find.text('You won!'), findsOneWidget);
         expect(find.text('Final ranking'), findsOneWidget);
         expect(stats.stats.battleWins, 1);
         noErrors(t);
       });
+
     });
   }
 }

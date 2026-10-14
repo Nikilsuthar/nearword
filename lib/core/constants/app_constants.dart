@@ -21,13 +21,12 @@ class AppConstants {
   // --- Coins ---------------------------------------------------------------
   static const int dailyLoginCoins = 20;
   static const int premiumCategoryCost = 100;
-  static const int winCoinsEasy = 10;
+  static const int winCoinsEasy = 8;
   static const int winCoinsMedium = 15;
-  static const int winCoinsHard = 25;
+  static const int winCoinsHard = 30;
   static const int fastWinBonusCoins = 5; // won in fewer than [fastWinGuesses]
   static const int fastWinGuesses = 10;
   static const int dailyWinBonusCoins = 15;
-  static const int battleWinBonusCoins = 30;
 
   // --- Hints (coins) ---------------------------------------------------------
   static const int hintBetterWordCost = 30;
@@ -41,9 +40,14 @@ class AppConstants {
   static const int battleGraceSeconds = 30; // after the first solver
   static const List<int> battleDurations = [120, 180, 300];
 
-  // --- Ads (defaults) ------------------------------------------------------------
-  static const int interstitialEveryNGames = 3;
-  static const int interstitialMinIntervalSeconds = 90;
+  /// Coins each player can put into a room (0 = just for fun).
+  static const List<int> stakeOptions = [0, 10, 25, 50, 100];
+
+  /// How long a challenge stays open (seconds).
+  static const List<int> challengeWindows = [600, 3600, 6 * 3600, 24 * 3600];
+
+  // --- Ads -------------------------------------------------------------------------
+  // Frequency, cooldown and retry rules live in the safe_ads package.
   static const Duration categoryAdUnlockDuration = Duration(hours: 24);
 
   // Hive box names.

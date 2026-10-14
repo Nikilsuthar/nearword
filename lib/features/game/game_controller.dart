@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
+import '../../core/services/daily_board_service.dart';
 import '../../core/services/semantic_engine.dart';
 import '../../core/services/settings_service.dart';
 import '../../core/services/storage_service.dart';
@@ -103,13 +104,17 @@ class GameController extends GetxController with WidgetsBindingObserver {
   Timer? _resultTimer;
   Worker? _battleWorker;
 
-  /// "Daily #42", the category name, "Quick play" ...
+  /// "Daily #42", the category name, "Quick play" ... (translated).
   String get title {
     final p = puzzle.value;
     if (p == null) return '';
-    return p.mode == PuzzleMode.category
-        ? (_repo.categoryById(p.category)?.name ?? p.label)
-        : p.label;
+    return switch (p.mode) {
+      PuzzleMode.daily => 'title_daily'.trParams({'n': '${p.number}'}),
+      PuzzleMode.random => 'title_quick'.tr,
+      PuzzleMode.category => 'cat_${p.category}'.tr,
+      PuzzleMode.battle => 'title_battle'.tr,
+      PuzzleMode.challenge => 'title_challenge'.tr,
+    };
   }
 
   int get guessCount => guesses.length;
@@ -184,6 +189,9 @@ class GameController extends GetxController with WidgetsBindingObserver {
       final ranking = _engine.rank(meta.secret);
 
       puzzle.value = meta;
+      if (!isBattle && _storage.loadGame(puzzleId) == null) {
+        _storage.addRecentSecret(meta.secret); // do not repeat it soon
+      }
       _ranking = ranking;
       _secret = ranking.secret;
       _rankings = ranking.byWord;
@@ -218,7 +226,7 @@ class GameController extends GetxController with WidgetsBindingObserver {
       }
     } catch (e) {
       isLoading.value = false;
-      loadError.value = 'Could not load this puzzle. Please try again.';
+      loadError.value = 'game_load_error';
     }
   }
 
@@ -245,7 +253,7 @@ class GameController extends GetxController with WidgetsBindingObserver {
       }
     }
     if (word == null) {
-      _flashMessage('Word not in our list.');
+      _flashMessage('word_unknown'.tr);
       shakeTick.value++;
       _settings?.bad();
       return GuessResult.unknown;
@@ -255,7 +263,7 @@ class GameController extends GetxController with WidgetsBindingObserver {
     final existing = guesses.firstWhereOrNull((g) => g.word == word);
     if (existing != null) {
       _highlight(existing.word);
-      _flashMessage('You already guessed "$word".');
+      _flashMessage('word_dup'.trParams({'w': word}));
       shakeTick.value++;
       _settings?.bad();
       return GuessResult.duplicate;
@@ -303,8 +311,10 @@ class GameController extends GetxController with WidgetsBindingObserver {
     final secret = _secret;
     if (secret == null) return null;
     final parts = <String>[
-      if (firstLetterRevealed.value) 'Starts with "${secret[0].toUpperCase()}"',
-      if (lengthRevealed.value) '${secret.length} letters',
+      if (firstLetterRevealed.value)
+        'hint_starts_with'.trParams({'l': secret[0].toUpperCase()}),
+      if (lengthRevealed.value)
+        'hint_letters'.trParams({'n': '${secret.length}'}),
     ];
     return parts.isEmpty ? null : parts.join(' · ');
   }
@@ -375,6 +385,23 @@ class GameController extends GetxController with WidgetsBindingObserver {
     _persist();
     _reportBattle(done: true);
     _emitResult(recorded: true);
+    _submitDaily();
+  }
+
+  /// Posts a finished daily puzzle to the online board (queued when offline).
+  void _submitDaily() {
+    final p = puzzle.value;
+    if (p == null || p.mode != PuzzleMode.daily) return;
+    if (!Get.isRegistered<DailyBoardService>()) return;
+    Get.find<DailyBoardService>().submit(
+      day: p.id.substring(6, 16),
+      set: p.wordSet,
+      level: p.level,
+      solved: hasWon,
+      guesses: guessCount,
+      seconds: elapsedSeconds.value,
+      best: bestRank ?? 99999,
+    );
   }
 
   /// Builds the [GameResult] (recording stats/coins when [recorded]) and hands

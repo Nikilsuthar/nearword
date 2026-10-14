@@ -4,7 +4,7 @@ import 'package:get/get.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/utils/icon_map.dart';
 import '../../core/widgets/app_background.dart';
-import '../../core/widgets/banner_ad_widget.dart';
+import '../../core/services/ads.dart';
 import 'categories_controller.dart';
 
 class CategoriesView extends GetView<CategoriesController> {
@@ -18,31 +18,26 @@ class CategoriesView extends GetView<CategoriesController> {
     final canAfford = controller.canAffordUnlock();
     final confirm = await Get.dialog<String>(
       AlertDialog(
-        title: Text('Unlock ${item.category.name}?'),
+        title: Text('unlock_title'.trParams({'name': 'cat_${item.category.id}'.tr})),
         content: Text(
           canAfford
-              ? 'Spend ${controller.unlockCost} coins to unlock this category forever.'
-              : 'You need ${controller.unlockCost} coins. Win puzzles and claim your '
-                  'daily bonus to earn more.',
+              ? 'unlock_afford'.trParams({'n': '${controller.unlockCost}'})
+              : 'unlock_need'.trParams({'n': '${controller.unlockCost}'}),
         ),
         actions: [
           TextButton(
             onPressed: () => Get.back(result: 'cancel'),
-            child: const Text('Cancel'),
+            child: Text('cancel'.tr),
           ),
-          Obx(
-            () => TextButton.icon(
-              onPressed: controller.rewardedReady.value
-                  ? () => Get.back(result: 'ad')
-                  : null,
-              icon: const Icon(Icons.play_circle_outline),
-              label: const Text('Free for 24h'),
-            ),
+          TextButton.icon(
+            onPressed: () => Get.back(result: 'ad'),
+            icon: const Icon(Icons.play_circle_outline),
+            label: Text('free_24h'.tr),
           ),
           if (canAfford)
             FilledButton(
               onPressed: () => Get.back(result: 'coins'),
-              child: Text('Unlock (${controller.unlockCost})'),
+              child: Text('unlock_btn'.trParams({'n': '${controller.unlockCost}'})),
             ),
         ],
       ),
@@ -54,16 +49,16 @@ class CategoriesView extends GetView<CategoriesController> {
       unlocked = await controller.unlockForDay(item);
       if (!unlocked) {
         Get.snackbar(
-          'Ad',
-          'Ad not available right now.',
+          'ok'.tr,
+          'ad_unavailable'.tr,
           snackPosition: SnackPosition.BOTTOM,
         );
       }
     }
     if (unlocked) {
       Get.snackbar(
-        'Unlocked',
-        '${item.category.name} is now available.',
+        'unlocked_title'.tr,
+        'unlocked_msg'.trParams({'name': 'cat_${item.category.id}'.tr}),
         snackPosition: SnackPosition.BOTTOM,
       );
     }
@@ -74,7 +69,7 @@ class CategoriesView extends GetView<CategoriesController> {
     return AppScaffold(
       maxWidth: 840,
       appBar: AppBar(
-        title: const Text('Categories'),
+        title: Text('categories'.tr),
         actions: [
           Obx(
             () => Padding(
@@ -88,7 +83,7 @@ class CategoriesView extends GetView<CategoriesController> {
           ),
         ],
       ),
-      bottomNavigationBar: const BannerAdWidget(),
+      bottomNavigationBar: Ads.banner('categories'),
       body: Obx(() {
         // Read the observable here, not inside the LayoutBuilder callback.
         final items = controller.items.toList();
@@ -136,7 +131,7 @@ class _CategoryCard extends StatelessWidget {
 
     return Semantics(
       button: true,
-      label: '${item.category.name}, ${item.solved} solved'
+      label: '${'cat_${item.category.id}'.tr}, ${item.solved}'
           '${item.locked ? ', locked' : ''}',
       excludeSemantics: true,
       child: SoftCard(
@@ -170,7 +165,9 @@ class _CategoryCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  item.category.name,
+                  'cat_${item.category.id}'.tr,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
                     fontWeight: FontWeight.w800,
                     fontSize: 17,
@@ -179,8 +176,11 @@ class _CategoryCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   item.solved == 0
-                      ? '${item.total} words'
-                      : '${item.solved} solved · ${item.total} words',
+                      ? 'cat_words'.trParams({'n': '${item.total}'})
+                      : 'cat_solved'.trParams({
+                          's': '${item.solved}',
+                          'n': '${item.total}',
+                        }),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
                   ),

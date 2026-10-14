@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 
-import '../../core/constants/app_constants.dart';
 import '../../core/widgets/app_background.dart';
 import '../../core/widgets/logo.dart';
 import 'splash_controller.dart';
@@ -22,11 +21,11 @@ class SplashView extends GetView<SplashController> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Text(err, textAlign: TextAlign.center),
+                  Text(err.tr, textAlign: TextAlign.center),
                   const SizedBox(height: 16),
                   FilledButton(
                     onPressed: controller.retry,
-                    child: const Text('Retry'),
+                    child: Text('retry'.tr),
                   ),
                 ],
               ),
@@ -44,7 +43,7 @@ class SplashView extends GetView<SplashController> {
               const Wordmark(fontSize: 40).animate().fadeIn(delay: 250.ms),
               const SizedBox(height: 8),
               Text(
-                AppConstants.tagline,
+                'app_tagline'.tr,
                 style: TextStyle(
                   color: Theme.of(context)
                       .colorScheme

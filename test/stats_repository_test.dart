@@ -45,9 +45,9 @@ void main() {
     expect(repo.stats.wins, 1);
     expect(repo.stats.averageGuesses, 12);
     expect(repo.stats.distribution['11-20'], 1);
-    // easy win (10) + first_win achievement (10)
-    expect(r.coins, 20);
-    expect(repo.coins.value, 20);
+    // easy win (8) + first_win achievement (10)
+    expect(r.coins, 18);
+    expect(repo.coins.value, 18);
   });
 
   test('fast win under 10 guesses earns bonus and Sharp Mind', () {
@@ -56,7 +56,7 @@ void main() {
       r.achievements.map((a) => a.id),
       containsAll(['first_win', 'under_10']),
     );
-    expect(StatsRepository.winReward(Difficulty.easy, 8), 15);
+    expect(StatsRepository.winReward(Difficulty.easy, 8), 13);
   });
 
   test('achievements unlock only once', () {

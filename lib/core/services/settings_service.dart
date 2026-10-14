@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 
 import '../constants/backend_config.dart';
+import '../../data/models/puzzle.dart';
 import '../utils/seeded.dart';
 import 'storage_service.dart';
 
@@ -17,6 +18,18 @@ class SettingsService extends GetxService {
   late final RxBool haptics;
   late final RxString nickname;
   late final RxBool onboarded;
+
+  /// Difficulty of the secret words (Easy / Medium / Hard).
+  late final Rx<Difficulty> level;
+
+  /// Regular English words or words familiar to Indian players.
+  late final Rx<WordSet> wordSet;
+
+  /// UI language code: 'en' or 'hi'.
+  late final RxString language;
+
+  /// False until the player has chosen language / word style / level once.
+  late final RxBool setupDone;
 
   /// Firebase Realtime Database URL entered in Settings (empty = none).
   late final RxString backendUrl;
@@ -32,8 +45,18 @@ class SettingsService extends GetxService {
     haptics = (_storage.getSetting<bool>('haptics') ?? true).obs;
     nickname = (_storage.getSetting<String>('nickname') ?? '').obs;
     onboarded = (_storage.getSetting<bool>('onboarded') ?? false).obs;
+    level = Difficulty.values
+        .firstWhere((d) => d.name == _storage.getSetting<String>('level'),
+            orElse: () => Difficulty.medium)
+        .obs;
+    wordSet = WordSet.values
+        .firstWhere((w) => w.name == _storage.getSetting<String>('word_set'),
+            orElse: () => WordSet.regular)
+        .obs;
+    language = (_storage.getSetting<String>('language') ?? 'en').obs;
+    setupDone = (_storage.getSetting<bool>('setup_done') ?? false).obs;
     backendUrl = (_storage.getSetting<String>('backend_url') ?? '').obs;
-    BackendConfig.override = backendUrl.value;
+    BackendConfig.urlOverride = backendUrl.value;
 
     var id = _storage.getSetting<String>('player_id');
     if (id == null) {
@@ -61,36 +84,56 @@ class SettingsService extends GetxService {
     _storage.setSetting('nickname', nickname.value);
   }
 
-  /// Saves the online-battle server URL. Returns an error message or null.
+  /// Saves the online server URL. Returns a translation key on error, else null.
   String? setBackendUrl(String raw) {
     final url = BackendConfig.normalize(raw);
-    final error = BackendConfig.validate(url);
-    if (error != null) return error;
+    if (BackendConfig.validate(url) != null) return 'db_bad_url';
     backendUrl.value = url;
-    BackendConfig.override = url;
+    BackendConfig.urlOverride = url;
     _storage.setSetting('backend_url', url);
     return null;
   }
 
   /// Checks that the configured database answers and allows reads.
-  /// Returns a human-readable result.
+  /// Returns a translation key describing the result ('db_connected' = ok).
   Future<String> testBackend() async {
-    if (!BackendConfig.online) return 'No server URL set.';
+    if (!BackendConfig.online) return 'db_none';
     try {
       // Reads one (empty) room path: allowed by the recommended rules, which
       // deliberately do not allow listing every room.
       final uri = Uri.parse('${BackendConfig.databaseUrl}/rooms/PING0.json');
       final res = await http.get(uri).timeout(const Duration(seconds: 8));
-      if (res.statusCode == 200) return 'Connected. Online rooms are ready.';
-      if (res.statusCode == 401 || res.statusCode == 403) {
-        return 'Server reachable, but permission denied. Set the database '
-            'rules to test mode (see README).';
-      }
-      if (res.statusCode == 404) return 'Database not found. Check the URL.';
-      return 'Unexpected answer (${res.statusCode}).';
+      if (res.statusCode == 200) return 'db_connected';
+      if (res.statusCode == 401 || res.statusCode == 403) return 'db_denied';
+      if (res.statusCode == 404) return 'db_notfound';
+      return 'db_unreachable';
     } catch (_) {
-      return 'Could not reach the server. Check the URL and your internet.';
+      return 'db_unreachable';
     }
+  }
+
+  void setLevel(Difficulty value) {
+    level.value = value;
+    _storage.setSetting('level', value.name);
+  }
+
+  void setWordSet(WordSet value) {
+    wordSet.value = value;
+    _storage.setSetting('word_set', value.name);
+  }
+
+  void setLanguage(String code) {
+    language.value = code == 'hi' ? 'hi' : 'en';
+    _storage.setSetting('language', language.value);
+    // Rebuild every screen with the new texts (outside the current event).
+    Future<void>.delayed(Duration.zero, () {
+      Get.updateLocale(Locale(language.value));
+    });
+  }
+
+  void completeSetup() {
+    setupDone.value = true;
+    _storage.setSetting('setup_done', true);
   }
 
   void markOnboarded() {

@@ -21,7 +21,7 @@ class AppTheme {
       brightness: brightness,
     ).copyWith(
       primary: isDark ? AppColors.brandSoft : AppColors.brand,
-      onPrimary: isDark ? const Color(0xFF1A1040) : Colors.white,
+      onPrimary: isDark ? const Color(0xFF06142B) : Colors.white,
       primaryContainer: AppColors.brand,
       onPrimaryContainer: Colors.white,
       secondary: AppColors.cyan,
@@ -126,6 +126,30 @@ class AppTheme {
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
           padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 15),
+        ),
+      ),
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: surface,
+        indicatorColor: AppColors.brand.withValues(alpha: 0.18),
+        height: 68,
+        labelTextStyle: WidgetStateProperty.resolveWith(
+          (states) => TextStyle(
+            fontSize: 12,
+            fontWeight: states.contains(WidgetState.selected)
+                ? FontWeight.w800
+                : FontWeight.w600,
+            color: states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.onSurface.withValues(alpha: 0.65),
+          ),
+        ),
+        iconTheme: WidgetStateProperty.resolveWith(
+          (states) => IconThemeData(
+            size: 26,
+            color: states.contains(WidgetState.selected)
+                ? scheme.primary
+                : scheme.onSurface.withValues(alpha: 0.65),
+          ),
         ),
       ),
       snackBarTheme: SnackBarThemeData(

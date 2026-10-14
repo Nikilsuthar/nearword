@@ -1,41 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:share_plus/share_plus.dart';
 
-import '../../core/constants/app_constants.dart';
+import '../../core/services/daily_board_service.dart';
+import '../../core/services/firebase_auth_service.dart';
 import '../../core/services/settings_service.dart';
 import '../../core/services/storage_service.dart';
-import '../../core/utils/seeded.dart';
 import '../../data/models/saved_game.dart';
 import '../../data/repositories/puzzle_repository.dart';
 import '../../data/repositories/stats_repository.dart';
 import '../../routes/app_routes.dart';
+import '../battle/battle_controller.dart';
 import 'widgets/how_to_play_sheet.dart';
 
 enum DailyState { fresh, inProgress, solved, gaveUp }
 
-/// Home: daily puzzle, quick play, categories, battle, friend challenges.
+/// Home shell: bottom tabs, today's puzzle, quick modes.
 class HomeController extends GetxController {
   final _repo = Get.find<PuzzleRepository>();
   final _storage = Get.find<StorageService>();
   final _stats = Get.find<StatsRepository>();
-  final _settings = Get.find<SettingsService>();
+  final settings = Get.find<SettingsService>();
+
+  /// 0 Home, 1 Rank, 2 Friends, 3 Me.
+  final RxInt tab = 0.obs;
 
   final Rxn<SavedGame> resumable = Rxn<SavedGame>();
   final Rx<DailyState> dailyState = DailyState.fresh.obs;
   final RxInt dailyGuesses = 0.obs;
   final RxInt dailyNumber = 1.obs;
+  final RxString dailyId = ''.obs;
+
+  /// Top players today (null = not loaded / online board off).
+  final Rxn<List<DailyEntry>> boardPreview = Rxn<List<DailyEntry>>();
+
   RxInt get coins => _stats.coins;
   RxInt get streak => _stats.streak;
   StatsRepository get statsRepo => _stats;
-
-  String get dailyId => _repo.todaysDailyId;
 
   @override
   void onInit() {
     super.onInit();
     _refresh();
     ever(_storage.revision, (_) => _refresh());
+    ever(settings.level, (_) {
+      _refresh();
+      loadBoardPreview();
+    });
+    ever(settings.wordSet, (_) {
+      _refresh();
+      loadBoardPreview();
+    });
   }
 
   @override
@@ -44,26 +58,46 @@ class HomeController extends GetxController {
     final bonus = _stats.claimDailyLogin();
     if (bonus > 0) {
       Get.snackbar(
-        'Daily bonus',
-        '+$bonus coins for coming back today!',
+        'daily_bonus'.tr,
+        'daily_bonus_msg'.trParams({'n': '$bonus'}),
         snackPosition: SnackPosition.BOTTOM,
         margin: const EdgeInsets.all(16),
       );
     }
-    if (!_settings.onboarded.value) {
+    if (!settings.onboarded.value) {
       Future<void>.delayed(const Duration(milliseconds: 500), () {
         HowToPlaySheet.show();
-        _settings.markOnboarded();
+        settings.markOnboarded();
       });
     }
+    _backgroundSync();
+  }
+
+  /// Signs in, sends results that could not be sent earlier, settles rooms
+  /// that finished while the app was closed and loads the board preview.
+  Future<void> _backgroundSync() async {
+    try {
+      if (Get.isRegistered<FirebaseAuthService>()) {
+        await Get.find<FirebaseAuthService>().signIn();
+      }
+      if (Get.isRegistered<DailyBoardService>()) {
+        await Get.find<DailyBoardService>().flushPending();
+      }
+      if (Get.isRegistered<BattleController>()) {
+        await Get.find<BattleController>().reconcile();
+      }
+    } catch (_) {}
+    await loadBoardPreview();
   }
 
   void _refresh() {
     resumable.value = _storage.latestUnfinished();
     // Streak can lapse at midnight even without new data.
     _stats.streak.value = _stats.displayStreak;
-    dailyNumber.value = _repo.dailyNumber(DateTime.now());
-    final saved = _storage.loadGame(dailyId);
+    dailyNumber.value = _repo.dailyNumber(_repo.now);
+    final id = _repo.todaysDailyId(settings.wordSet.value, settings.level.value);
+    dailyId.value = id;
+    final saved = _storage.loadGame(id);
     dailyGuesses.value = saved?.guesses.length ?? 0;
     dailyState.value = switch (saved?.status) {
       GameStatus.won => DailyState.solved,
@@ -74,10 +108,32 @@ class HomeController extends GetxController {
     };
   }
 
-  void playDaily() => Get.toNamed(Routes.game, arguments: dailyId);
+  Future<void> loadBoardPreview() async {
+    if (!Get.isRegistered<DailyBoardService>()) return;
+    final board = Get.find<DailyBoardService>();
+    if (!board.enabled) {
+      boardPreview.value = null;
+      return;
+    }
+    try {
+      final list = await board.top(
+        _repo.todaysDailyId(settings.wordSet.value, settings.level.value).substring(6, 16),
+        settings.wordSet.value,
+        settings.level.value,
+        limit: 3,
+      );
+      boardPreview.value = list;
+    } catch (_) {
+      boardPreview.value = null;
+    }
+  }
 
-  void playRandom() =>
-      Get.toNamed(Routes.game, arguments: _repo.randomId());
+  void playDaily() => Get.toNamed(Routes.game, arguments: dailyId.value);
+
+  void playRandom() => Get.toNamed(
+        Routes.game,
+        arguments: _repo.randomId(settings.wordSet.value, settings.level.value),
+      );
 
   void resume() {
     final r = resumable.value;
@@ -85,33 +141,6 @@ class HomeController extends GetxController {
   }
 
   void openCategories() => Get.toNamed(Routes.categories);
-  void openStats() => Get.toNamed(Routes.stats);
   void openSettings() => Get.toNamed(Routes.settings);
-  void openBattle() => Get.toNamed(Routes.battle);
-
-  // --- Friend challenge -------------------------------------------------------
-
-  /// Creates a puzzle code and opens the share sheet. The friend types the
-  /// code in "Challenge a friend" and gets exactly the same secret word.
-  Future<void> createChallenge() async {
-    final id = _repo.randomId();
-    final code = id.substring(4);
-    await Share.share(
-      '${AppConstants.appName} challenge! Can you find my secret word faster '
-      'than me? Open the app > Challenge a friend > enter code $code',
-    );
-    Get.toNamed(Routes.game, arguments: id);
-  }
-
-  /// Puzzle id for a typed challenge code, or null when the code is invalid.
-  String? challengeIdFor(String raw) {
-    final code = Seeded.normalizeCode(raw);
-    if (code.length != 6) return null;
-    final id = 'rnd-$code';
-    return _repo.puzzleById(id) == null ? null : id;
-  }
-
-  void openPuzzle(String id) => Get.toNamed(Routes.game, arguments: id);
-
   void showHowToPlay() => HowToPlaySheet.show();
 }

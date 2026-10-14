@@ -1,78 +1,157 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:safe_ads/safe_ads.dart';
 
+import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_constants.dart';
-import '../../core/services/consent_service.dart';
+import '../../core/constants/backend_config.dart';
+import '../../core/services/ads.dart';
+import '../../core/services/firebase_auth_service.dart';
 import '../../core/services/settings_service.dart';
 import '../../core/widgets/app_background.dart';
+import '../../core/widgets/ui_kit.dart';
+import '../../data/models/puzzle.dart';
 import '../home/widgets/how_to_play_sheet.dart';
 
-class SettingsView extends StatelessWidget {
+class SettingsView extends StatefulWidget {
   const SettingsView({super.key});
 
   @override
+  State<SettingsView> createState() => _SettingsViewState();
+}
+
+class _SettingsViewState extends State<SettingsView> {
+  final s = Get.find<SettingsService>();
+  late final TextEditingController _nick =
+      TextEditingController(text: s.nickname.value);
+
+  @override
+  void dispose() {
+    _nick.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final s = Get.find<SettingsService>();
     final scheme = Theme.of(context).colorScheme;
-    final nick = TextEditingController(text: s.nickname.value);
-
-    Widget section(String title) => Padding(
-          padding: const EdgeInsets.fromLTRB(4, 20, 4, 8),
-          child: Text(
-            title.toUpperCase(),
-            style: TextStyle(
-              fontSize: 12,
-              fontWeight: FontWeight.w900,
-              letterSpacing: 1.2,
-              color: scheme.onSurface.withValues(alpha: 0.55),
-            ),
-          ),
-        );
-
     return AppScaffold(
-      appBar: AppBar(title: const Text('Settings')),
+      appBar: AppBar(title: Text('settings'.tr)),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 0, 20, 28),
         children: [
-          section('Profile'),
+          _section(context, 'set_profile'.tr),
           SoftCard(
             child: TextField(
-              controller: nick,
+              controller: _nick,
               maxLength: 14,
               textInputAction: TextInputAction.done,
-              decoration: const InputDecoration(
-                labelText: 'Nickname (shown in battles)',
+              decoration: InputDecoration(
+                labelText: 'set_nickname'.tr,
                 counterText: '',
-                prefixIcon: Icon(Icons.person_rounded),
+                prefixIcon: const Icon(Icons.person_rounded),
               ),
               onChanged: s.setNickname,
             ),
           ),
-          section('Appearance'),
-          SoftCard(
-            child: Obx(
-              () => SegmentedButton<ThemeMode>(
-                showSelectedIcon: false,
-                segments: const [
-                  ButtonSegment(
-                    value: ThemeMode.dark,
-                    icon: Icon(Icons.dark_mode_rounded),
-                    label: Text('Dark'),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.light,
-                    icon: Icon(Icons.light_mode_rounded),
-                    label: Text('Light'),
-                  ),
-                  ButtonSegment(
-                    value: ThemeMode.system,
-                    icon: Icon(Icons.phone_android_rounded),
-                    label: Text('Auto'),
-                  ),
-                ],
-                selected: {s.themeMode.value},
-                onSelectionChanged: (v) => s.setThemeMode(v.first),
-              ),
+
+          _section(context, 'set_game'.tr),
+          Text(
+            'set_style'.tr,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          Obx(
+            () => ChoiceCards<WordSet>(
+              vertical: true,
+              selected: s.wordSet.value,
+              onChanged: s.setWordSet,
+              options: [
+                ChoiceOption(
+                  WordSet.regular,
+                  'style_regular'.tr,
+                  subtitle: 'style_regular_sub'.tr,
+                  icon: Icons.menu_book_rounded,
+                ),
+                ChoiceOption(
+                  WordSet.india,
+                  'style_india'.tr,
+                  subtitle: 'style_india_sub'.tr,
+                  icon: Icons.temple_hindu_rounded,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'set_level'.tr,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          Obx(
+            () => ChoiceCards<Difficulty>(
+              vertical: true,
+              selected: s.level.value,
+              onChanged: s.setLevel,
+              options: [
+                ChoiceOption(
+                  Difficulty.easy,
+                  'level_easy'.tr,
+                  subtitle: 'level_easy_sub'.tr,
+                  icon: Icons.sentiment_satisfied_alt_rounded,
+                ),
+                ChoiceOption(
+                  Difficulty.medium,
+                  'level_medium'.tr,
+                  subtitle: 'level_medium_sub'.tr,
+                  icon: Icons.psychology_alt_rounded,
+                ),
+                ChoiceOption(
+                  Difficulty.hard,
+                  'level_hard'.tr,
+                  subtitle: 'level_hard_sub'.tr,
+                  icon: Icons.local_fire_department_rounded,
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            'set_changes_apply'.tr,
+            style: TextStyle(
+              fontSize: 12.5,
+              color: scheme.onSurface.withValues(alpha: 0.6),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'set_language'.tr,
+            style: const TextStyle(fontWeight: FontWeight.w800),
+          ),
+          const SizedBox(height: 8),
+          Obx(
+            () => ChoiceCards<String>(
+              selected: s.language.value,
+              onChanged: s.setLanguage,
+              options: [
+                ChoiceOption('en', 'language_en'.tr),
+                ChoiceOption('hi', 'language_hi'.tr),
+              ],
+            ),
+          ),
+
+          _section(context, 'set_appearance'.tr),
+          Obx(
+            () => ChoiceCards<ThemeMode>(
+              selected: s.themeMode.value,
+              onChanged: s.setThemeMode,
+              options: [
+                ChoiceOption(ThemeMode.dark, 'theme_dark'.tr,
+                    icon: Icons.dark_mode_rounded),
+                ChoiceOption(ThemeMode.light, 'theme_light'.tr,
+                    icon: Icons.light_mode_rounded),
+                ChoiceOption(ThemeMode.system, 'theme_auto'.tr,
+                    icon: Icons.phone_android_rounded),
+              ],
             ),
           ),
           const SizedBox(height: 10),
@@ -81,59 +160,68 @@ class SettingsView extends StatelessWidget {
             child: Obx(
               () => SwitchListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 8),
-                title: const Text('Haptic feedback',
-                    style: TextStyle(fontWeight: FontWeight.w700)),
-                subtitle: const Text('Vibrate on guesses and wins'),
+                title: Text(
+                  'haptics'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                subtitle: Text('haptics_sub'.tr),
                 value: s.haptics.value,
                 onChanged: s.setHaptics,
               ),
             ),
           ),
-          section('Online battles'),
+
+          _section(context, 'set_online'.tr),
           _ServerCard(settings: s),
-          section('Help'),
+
+          _section(context, 'set_help'.tr),
           SoftCard(
             onTap: HowToPlaySheet.show,
-            child: const Row(
+            child: Row(
               children: [
-                Icon(Icons.help_outline_rounded),
-                SizedBox(width: 12),
+                const Icon(Icons.help_outline_rounded),
+                const SizedBox(width: 12),
                 Expanded(
-                  child: Text('How to play',
-                      style: TextStyle(fontWeight: FontWeight.w700)),
+                  child: Text(
+                    'how_to_play'.tr,
+                    style: const TextStyle(fontWeight: FontWeight.w700),
+                  ),
                 ),
-                Icon(Icons.chevron_right_rounded),
+                const Icon(Icons.chevron_right_rounded),
               ],
             ),
           ),
-          FutureBuilder<bool>(
-            future: ConsentService().privacyOptionsRequired,
-            builder: (context, snap) {
-              if (snap.data != true) return const SizedBox.shrink();
-              return Padding(
-                padding: const EdgeInsets.only(top: 10),
-                child: SoftCard(
-                  onTap: ConsentService().showPrivacyOptions,
-                  child: const Row(
-                    children: [
-                      Icon(Icons.privacy_tip_outlined),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Text('Privacy & ad choices',
-                            style: TextStyle(fontWeight: FontWeight.w700)),
-                      ),
-                      Icon(Icons.chevron_right_rounded),
-                    ],
+          if (Ads.privacyOptionsAvailable)
+            ValueListenableBuilder<bool>(
+              valueListenable: SafeAds.privacyOptionsRequired,
+              builder: (context, required, _) {
+                if (!required) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(top: 10),
+                  child: SoftCard(
+                    onTap: SafeAds.showPrivacyOptions,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.privacy_tip_outlined),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Text(
+                            'privacy_ads'.tr,
+                            style: const TextStyle(fontWeight: FontWeight.w700),
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right_rounded),
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
-          ),
+                );
+              },
+            ),
           const SizedBox(height: 28),
           Center(
             child: Text(
-              '${AppConstants.appName} · ${AppConstants.tagline}\n'
-              'Word similarity powered by GloVe embeddings.',
+              '${AppConstants.appName} · ${'app_tagline'.tr}\n'
+              '${'about_line'.tr}',
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 12.5,
@@ -145,6 +233,20 @@ class SettingsView extends StatelessWidget {
       ),
     );
   }
+
+  Widget _section(BuildContext context, String title) => Padding(
+        padding: const EdgeInsets.fromLTRB(4, 22, 4, 10),
+        child: Text(
+          title.toUpperCase(),
+          style: TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w900,
+            letterSpacing: 1.2,
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.55),
+          ),
+        ),
+      );
 }
 
 class _ServerCard extends StatefulWidget {
@@ -157,9 +259,12 @@ class _ServerCard extends StatefulWidget {
 }
 
 class _ServerCardState extends State<_ServerCard> {
-  late final TextEditingController _url =
-      TextEditingController(text: widget.settings.backendUrl.value);
-  String? _message;
+  late final TextEditingController _url = TextEditingController(
+    text: widget.settings.backendUrl.value.isNotEmpty
+        ? widget.settings.backendUrl.value
+        : BackendConfig.databaseUrl,
+  );
+  String? _message; // translation key
   bool _ok = false;
   bool _busy = false;
 
@@ -174,9 +279,7 @@ class _ServerCardState extends State<_ServerCard> {
     setState(() {
       _ok = err == null;
       _message = err ??
-          (widget.settings.backendUrl.value.isEmpty
-              ? 'Online server removed.'
-              : 'Saved.');
+          (widget.settings.backendUrl.value.isEmpty ? 'db_removed' : 'db_saved');
       if (err == null) _url.text = widget.settings.backendUrl.value;
     });
   }
@@ -185,12 +288,16 @@ class _ServerCardState extends State<_ServerCard> {
     _save();
     if (!_ok) return;
     setState(() => _busy = true);
-    final result = await widget.settings.testBackend();
+    final key = await widget.settings.testBackend();
+    // Also try signing in so the status is truthful.
+    if (key == 'db_connected' && Get.isRegistered<FirebaseAuthService>()) {
+      await Get.find<FirebaseAuthService>().signIn();
+    }
     if (!mounted) return;
     setState(() {
       _busy = false;
-      _ok = result.startsWith('Connected');
-      _message = result;
+      _ok = key == 'db_connected';
+      _message = key;
     });
   }
 
@@ -202,9 +309,7 @@ class _ServerCardState extends State<_ServerCard> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Paste your Firebase Realtime Database URL so you and your '
-            'friends can play in the same room. Every phone needs the '
-            'same URL.',
+            'set_online_help'.tr,
             style: TextStyle(
               fontSize: 12.5,
               color: scheme.onSurface.withValues(alpha: 0.65),
@@ -215,10 +320,10 @@ class _ServerCardState extends State<_ServerCard> {
             controller: _url,
             keyboardType: TextInputType.url,
             autocorrect: false,
-            decoration: const InputDecoration(
-              labelText: 'Database URL',
+            decoration: InputDecoration(
+              labelText: 'db_url'.tr,
               hintText: 'https://xxxx-default-rtdb.firebaseio.com',
-              prefixIcon: Icon(Icons.cloud_rounded),
+              prefixIcon: const Icon(Icons.cloud_rounded),
             ),
             onSubmitted: (_) => _save(),
           ),
@@ -228,7 +333,7 @@ class _ServerCardState extends State<_ServerCard> {
               Expanded(
                 child: OutlinedButton(
                   onPressed: _busy ? null : _save,
-                  child: const Text('Save'),
+                  child: Text('save'.tr),
                 ),
               ),
               const SizedBox(width: 10),
@@ -241,7 +346,7 @@ class _ServerCardState extends State<_ServerCard> {
                           height: 18,
                           child: CircularProgressIndicator(strokeWidth: 2.4),
                         )
-                      : const Text('Test'),
+                      : Text('test'.tr),
                 ),
               ),
             ],
@@ -249,10 +354,10 @@ class _ServerCardState extends State<_ServerCard> {
           if (_message != null) ...[
             const SizedBox(height: 10),
             Text(
-              _message!,
+              _message!.tr,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: _ok ? const Color(0xFF1E9E6A) : const Color(0xFFFF6B81),
+                color: _ok ? AppColors.green : AppColors.red,
               ),
             ),
           ],
