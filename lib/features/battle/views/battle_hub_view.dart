@@ -50,7 +50,7 @@ class _BattleHubViewState extends State<BattleHubView> {
     if (!_ensureNickname()) return;
     if (!practice && !BackendConfig.online) {
       battle.error.value =
-          'Online rooms need a Firebase database URL (see README). '
+          'Online rooms need a server URL: Settings > Online battles. '
           'Try a practice battle meanwhile.';
       return;
     }
@@ -63,7 +63,7 @@ class _BattleHubViewState extends State<BattleHubView> {
     if (!_ensureNickname()) return;
     if (!BackendConfig.online) {
       battle.error.value =
-          'Joining online rooms needs a Firebase database URL (see README).';
+          'Joining online rooms needs a server URL: Settings > Online battles.';
       return;
     }
     if (await battle.joinRoom(_code.text)) Get.toNamed(Routes.battleRoom);
@@ -207,8 +207,8 @@ class _BattleHubViewState extends State<BattleHubView> {
           if (!BackendConfig.online) ...[
             const SizedBox(height: 14),
             Text(
-              'Online rooms are switched off until a Firebase Realtime '
-              'Database URL is set in backend_config.dart.',
+              'Online rooms are off until a Firebase Realtime Database URL is '
+              'set in Settings > Online battles.',
               style: TextStyle(
                 fontSize: 12.5,
                 color: scheme.onSurface.withValues(alpha: 0.55),

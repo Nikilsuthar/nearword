@@ -19,14 +19,13 @@ import 'storage_service.dart';
 ///   Result screen calls between games (never mid-game).
 class AdService extends GetxService {
   AdService(this._storage, {InterstitialPolicy? policy})
-    : policy =
-          policy ??
-          InterstitialPolicy(
-            everyNGames: AppConstants.interstitialEveryNGames,
-            minInterval: const Duration(
-              seconds: AppConstants.interstitialMinIntervalSeconds,
-            ),
-          );
+      : policy = policy ??
+            InterstitialPolicy(
+              everyNGames: AppConstants.interstitialEveryNGames,
+              minInterval: const Duration(
+                seconds: AppConstants.interstitialMinIntervalSeconds,
+              ),
+            );
 
   final StorageService _storage;
   final InterstitialPolicy policy;

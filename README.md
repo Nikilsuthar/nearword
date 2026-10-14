@@ -53,7 +53,8 @@ Battles use the **Firebase Realtime Database REST API** – no SDK or
 
 1. [Firebase console](https://console.firebase.google.com) → create project →
    *Build → Realtime Database → Create database*.
-2. Paste the database URL into
+2. Enter the database URL on each phone in **Settings > Online battles** (then
+   tap *Test*), or bake it into
    [`lib/core/constants/backend_config.dart`](lib/core/constants/backend_config.dart).
 3. Paste [`database.rules.json`](database.rules.json) into the **Rules** tab.
 

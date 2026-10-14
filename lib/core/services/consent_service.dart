@@ -45,8 +45,8 @@ class ConsentService {
   /// True when the user must be offered a "Privacy options" entry (Settings).
   Future<bool> get privacyOptionsRequired async {
     if (!_supported) return false;
-    final status = await ConsentInformation.instance
-        .getPrivacyOptionsRequirementStatus();
+    final status =
+        await ConsentInformation.instance.getPrivacyOptionsRequirementStatus();
     return status == PrivacyOptionsRequirementStatus.required;
   }
 

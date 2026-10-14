@@ -21,7 +21,8 @@ class Seeded {
   }
 
   /// Picks an element of [items] deterministically from [key].
-  static T pick<T>(List<T> items, String key) => items[hash(key) % items.length];
+  static T pick<T>(List<T> items, String key) =>
+      items[hash(key) % items.length];
 
   static const _codeAlphabet = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 
