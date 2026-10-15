@@ -5,6 +5,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
@@ -270,6 +271,12 @@ Future<void> boot(
       translations: AppTranslations(),
       locale: Locale(language),
       fallbackLocale: AppTranslations.fallback,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: AppTranslations.supported,
       initialRoute: initialRoute,
       getPages: AppPages.pages,
     ),

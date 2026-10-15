@@ -5,6 +5,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get/get.dart';
+import 'package:nearword/features/home/home_controller.dart';
 import 'package:nearword/data/models/puzzle.dart';
 import 'package:nearword/features/battle/battle_controller.dart';
 import 'package:nearword/routes/app_routes.dart';
@@ -106,6 +107,37 @@ void main() {
         await back(t);
         await openTab(t, 'Home');
         expect(find.text('India · Hard'), findsWidgets);
+        noErrors(t);
+      });
+
+      testWidgets('hindi: every tab, settings and the game render', (t) async {
+        await boot(t, mode: mode, language: 'hi');
+        final nav = find.byType(NavigationBar);
+        final labels = t
+            .widgetList<NavigationDestination>(
+                find.descendant(of: nav, matching: find.byType(NavigationDestination)))
+            .map((d) => d.label)
+            .toList();
+        expect(labels.length, 4);
+        for (final l in labels) {
+          await t.tap(find.descendant(of: nav, matching: find.text(l)));
+          await pump(t, 600);
+          expect(find.byType(ErrorWidget), findsNothing, reason: l);
+          noErrors(t);
+        }
+        await t.tap(find.descendant(of: nav, matching: find.text(labels.last)));
+        await pump(t, 600);
+        await tapText(t, 'सेटिंग्स');
+        expect(find.byType(ErrorWidget), findsNothing);
+        noErrors(t);
+        await back(t);
+        await t.tap(find.descendant(of: nav, matching: find.text(labels.first)));
+        await pump(t, 600);
+        final home = Get.find<HomeController>();
+        home.playRandom();
+        await pump(t, 1500);
+        expect(find.byType(TextField), findsWidgets);
+        expect(find.byType(ErrorWidget), findsNothing);
         noErrors(t);
       });
 

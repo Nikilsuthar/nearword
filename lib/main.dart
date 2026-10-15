@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 
@@ -27,6 +28,11 @@ class NearWordApp extends StatelessWidget {
       translations: AppTranslations(),
       locale: AppTranslations.fallback,
       fallbackLocale: AppTranslations.fallback,
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
       supportedLocales: AppTranslations.supported,
       initialRoute: AppPages.initial,
       getPages: AppPages.pages,

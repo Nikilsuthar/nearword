@@ -9,6 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_localizations:
+    sdk: flutter
 
   # Targets Flutter 3.27 / Dart 3.6 (the SDK installed on this PC).
   cupertino_icons: ^1.0.8
