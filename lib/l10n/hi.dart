@@ -257,6 +257,7 @@ const Map<String, String> hiStrings = {
   'db_none': 'कोई सर्वर URL नहीं डाला गया।',
   'db_bad_url': 'पूरा https:// डेटाबेस URL डालें।',
   'set_help': 'मदद',
+  'privacy_policy': 'गोपनीयता नीति',
   'privacy_ads': 'गोपनीयता और विज्ञापन विकल्प',
   'about_line': 'शब्दों की समानता GloVe एम्बेडिंग से।',
   'set_changes_apply': 'बदलाव आपकी अगली पहेलियों पर लागू होंगे।',

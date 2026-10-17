@@ -257,6 +257,7 @@ const Map<String, String> enStrings = {
   'db_none': 'No server URL set.',
   'db_bad_url': 'Enter the full https:// database URL.',
   'set_help': 'Help',
+  'privacy_policy': 'Privacy policy',
   'privacy_ads': 'Privacy & ad choices',
   'about_line': 'Word similarity powered by GloVe embeddings.',
   'set_changes_apply': 'Changes apply to your next puzzles.',

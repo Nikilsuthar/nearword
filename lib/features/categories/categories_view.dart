@@ -83,7 +83,7 @@ class CategoriesView extends GetView<CategoriesController> {
           ),
         ],
       ),
-      bottomNavigationBar: Ads.banner('categories'),
+      bottomNavigationBar: SafeArea(top: false, child: Ads.banner('categories')),
       body: Obx(() {
         // Read the observable here, not inside the LayoutBuilder callback.
         final items = controller.items.toList();

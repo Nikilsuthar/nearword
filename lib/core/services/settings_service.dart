@@ -47,7 +47,7 @@ class SettingsService extends GetxService {
     onboarded = (_storage.getSetting<bool>('onboarded') ?? false).obs;
     level = Difficulty.values
         .firstWhere((d) => d.name == _storage.getSetting<String>('level'),
-            orElse: () => Difficulty.medium)
+            orElse: () => Difficulty.easy)
         .obs;
     wordSet = WordSet.values
         .firstWhere((w) => w.name == _storage.getSetting<String>('word_set'),

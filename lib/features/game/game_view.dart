@@ -132,6 +132,13 @@ class GameView extends GetView<GameController> {
   }
 }
 
+/// The Scaffold consumes the keyboard inset for its body, so read it from the
+/// view; MediaQuery.of keeps this widget rebuilding when the layout changes.
+bool _keyboardOpen(BuildContext context) {
+  MediaQuery.of(context);
+  return View.of(context).viewInsets.bottom > 0;
+}
+
 class _Body extends StatelessWidget {
   const _Body({required this.controller});
 
@@ -217,31 +224,33 @@ class _Body extends StatelessWidget {
           }),
           const SizedBox(height: 12),
           Obx(() => LatestCard(guess: controller.latest.value)),
-          const SizedBox(height: 12),
-          // List / radar switch.
-          Obx(
-            () => SegmentedButton<bool>(
-              showSelectedIcon: false,
-              style: SegmentedButton.styleFrom(
-                visualDensity: VisualDensity.compact,
-                side: BorderSide(color: scheme.outline),
+          // List / radar switch (hidden while typing to leave room for guesses).
+          if (!_keyboardOpen(context)) ...[
+            const SizedBox(height: 12),
+            Obx(
+              () => SegmentedButton<bool>(
+                showSelectedIcon: false,
+                style: SegmentedButton.styleFrom(
+                  visualDensity: VisualDensity.compact,
+                  side: BorderSide(color: scheme.outline),
+                ),
+                segments: [
+                  ButtonSegment(
+                    value: false,
+                    icon: Icon(Icons.view_list_rounded, size: 18),
+                    label: Text('list_tab'.tr),
+                  ),
+                  ButtonSegment(
+                    value: true,
+                    icon: Icon(Icons.radar_rounded, size: 18),
+                    label: Text('radar_tab'.tr),
+                  ),
+                ],
+                selected: {controller.radarView.value},
+                onSelectionChanged: (s) => controller.radarView.value = s.first,
               ),
-              segments: [
-                ButtonSegment(
-                  value: false,
-                  icon: Icon(Icons.view_list_rounded, size: 18),
-                  label: Text('list_tab'.tr),
-                ),
-                ButtonSegment(
-                  value: true,
-                  icon: Icon(Icons.radar_rounded, size: 18),
-                  label: Text('radar_tab'.tr),
-                ),
-              ],
-              selected: {controller.radarView.value},
-              onSelectionChanged: (s) => controller.radarView.value = s.first,
             ),
-          ),
+          ],
           const SizedBox(height: 6),
           Expanded(
             child: Obx(() {

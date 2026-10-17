@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 import 'package:get/get.dart';
 import 'package:safe_ads/safe_ads.dart';
 
@@ -171,8 +172,11 @@ class _SettingsViewState extends State<SettingsView> {
             ),
           ),
 
-          _section(context, 'set_online'.tr),
-          _ServerCard(settings: s),
+          // Only developer builds (no baked-in server) can edit the server URL.
+          if (BackendConfig.defaultUrl.trim().isEmpty) ...[
+            _section(context, 'set_online'.tr),
+            _ServerCard(settings: s),
+          ],
 
           _section(context, 'set_help'.tr),
           SoftCard(
@@ -189,6 +193,28 @@ class _SettingsViewState extends State<SettingsView> {
                 ),
                 const Icon(Icons.chevron_right_rounded),
               ],
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: SoftCard(
+              onTap: () => launchUrl(
+                Uri.parse(AppConstants.privacyPolicyUrl),
+                mode: LaunchMode.externalApplication,
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.policy_outlined),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'privacy_policy'.tr,
+                      style: const TextStyle(fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  const Icon(Icons.open_in_new_rounded, size: 18),
+                ],
+              ),
             ),
           ),
           if (Ads.privacyOptionsAvailable)

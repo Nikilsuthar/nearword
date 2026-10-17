@@ -1,0 +1,3 @@
+-dontwarn com.google.android.play.core.**
+-keep class io.flutter.** { *; }
+-keep class com.google.android.gms.ads.** { *; }

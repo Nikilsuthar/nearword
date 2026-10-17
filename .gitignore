@@ -51,3 +51,7 @@ firebase-debug.log
 web/
 build/
 tools/_tmp/
+
+android/key.properties
+android/*.jks
+*.jks
