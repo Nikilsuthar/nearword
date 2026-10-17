@@ -135,7 +135,8 @@ class _RoomResultViewState extends State<RoomResultView> {
                   textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.headlineMedium,
                 ),
-                if (r != null && finished) ...[ // no spoilers before the round ends
+                if (r != null && finished) ...[
+                  // no spoilers before the round ends
                   const SizedBox(height: 14),
                   SoftCard(
                     borderColor: AppColors.teal,
@@ -178,9 +179,9 @@ class _RoomResultViewState extends State<RoomResultView> {
                               for (var i = 0;
                                   i < math.min(3, r.closestWords.length);
                                   i++)
-                                Chip(
-                                  avatar: Text(['🥇', '🥈', '🥉'][i]),
-                                  label: Text(r.closestWords[i]),
+                                _WordPill(
+                                  medal: ['🥇', '🥈', '🥉'][i],
+                                  word: r.closestWords[i],
                                 )
                                     .animate()
                                     .fadeIn(delay: (500 + i * 150).ms)
@@ -312,6 +313,50 @@ class _RoomResultViewState extends State<RoomResultView> {
             ),
           ),
         ]),
+      ),
+    );
+  }
+}
+
+/// A word with its medal. A plain Row (not a Chip) so the emoji is never
+/// squeezed into Chip's small avatar box and clipped.
+class _WordPill extends StatelessWidget {
+  const _WordPill({required this.medal, required this.word});
+
+  final String medal;
+  final String word;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Container(
+      padding: const EdgeInsets.fromLTRB(10, 7, 14, 7),
+      decoration: BoxDecoration(
+        color: scheme.primary.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: scheme.primary.withValues(alpha: 0.35)),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: 26,
+            child: Text(
+              medal,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontSize: 18, height: 1.2),
+            ),
+          ),
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(
+              word,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+            ),
+          ),
+        ],
       ),
     );
   }

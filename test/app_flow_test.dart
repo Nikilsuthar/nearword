@@ -139,6 +139,30 @@ void main() {
         noErrors(t);
       });
 
+      testWidgets('keyboard stays connected after a wrong or duplicate word',
+          (t) async {
+        await boot(t, mode: mode);
+        await tapText(t, 'Play today');
+        await pump(t, 1500);
+        final field = find.byType(TextField);
+        final before = t.element(field);
+        await guess(t, 'xyzzyqq'); // unknown word -> shake
+        await pump(t, 600);
+        // The same field element survives (no rebuild with a new key) and
+        // still owns the keyboard connection.
+        expect(t.element(field), same(before));
+        expect(t.testTextInput.hasAnyClients, isTrue);
+        await guess(t, 'water'); // typing still works
+        expect(find.text('water'), findsWidgets);
+        await guess(t, 'water'); // duplicate -> shake
+        await pump(t, 600);
+        expect(t.element(field), same(before));
+        expect(t.testTextInput.hasAnyClients, isTrue);
+        await guess(t, 'house');
+        expect(find.text('house'), findsWidgets);
+        noErrors(t);
+      });
+
       testWidgets('daily: guesses, duplicate, unknown, radar, hints',
           (t) async {
         await boot(t, mode: mode);
@@ -348,13 +372,45 @@ void main() {
         await guess(t, secret);
         await pump(t, 2500);
         expect(find.text('Round in progress…'), findsOneWidget);
+        // No spoiler while others are still guessing.
+        expect(find.text('Winning word'), findsNothing);
+        expect(find.text(secret.toUpperCase()), findsNothing);
         expect(battle.myPlace, 1);
         // The round closes 30 s after the first solve -> final ranking.
         await pump(t, 32000);
         expect(find.text('You won!'), findsOneWidget);
         expect(find.text('Final ranking'), findsOneWidget);
+        // Winning word card: the word, the top-3 nearest words with medals.
+        expect(find.text('Winning word'), findsOneWidget);
+        expect(find.text(secret.toUpperCase()), findsOneWidget);
+        expect(find.text('Closest words'), findsOneWidget);
+        for (final medal in ['🥇', '🥈', '🥉']) {
+          expect(find.text(medal), findsWidgets, reason: medal);
+        }
+        final nearest = engine.rank(secret).byRank.sublist(1, 4);
+        expect(nearest.length, greaterThanOrEqualTo(3));
+        for (final w in nearest.take(3)) {
+          expect(find.text(w), findsWidgets, reason: w);
+        }
         expect(stats.stats.battleWins, 1);
         noErrors(t);
+      });
+
+      testWidgets('battle finish screen fits a small phone and big text',
+          (t) async {
+        await boot(t,
+            mode: mode, logical: const Size(320, 640), textScale: 1.6);
+        await openTab(t, 'Friends');
+        await tapText(t, 'Practice vs bots');
+        await pump(t, 800);
+        final battle = Get.find<BattleController>();
+        final secret = repo.puzzleById(battle.puzzleId)!.secret;
+        await tapText(t, 'Start battle');
+        await pump(t, 6500);
+        await guess(t, secret);
+        await pump(t, 34000);
+        expect(find.text('Winning word'), findsOneWidget);
+        noErrors(t); // fails on any RenderFlex overflow / clipped layout error
       });
 
     });

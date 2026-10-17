@@ -1,5 +1,6 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:get/get.dart';
 
 import '../../../core/constants/app_colors.dart';
@@ -7,8 +8,40 @@ import '../game_controller.dart';
 
 /// Bottom input: auto-focused text field + submit button. Shakes when
 /// [GameController.shakeTick] changes (duplicate / unknown word).
-class GuessInput extends GetView<GameController> {
+class GuessInput extends StatefulWidget {
   const GuessInput({super.key});
+
+  @override
+  State<GuessInput> createState() => _GuessInputState();
+}
+
+class _GuessInputState extends State<GuessInput>
+    with SingleTickerProviderStateMixin {
+  final GameController controller = Get.find<GameController>();
+
+  /// Drives the shake. The text field itself is never rebuilt with a new key,
+  /// because that would drop the keyboard connection (typing would stop after
+  /// a wrong or duplicate word).
+  late final AnimationController _shake = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 350),
+  );
+  Worker? _worker;
+
+  @override
+  void initState() {
+    super.initState();
+    _worker = ever(controller.shakeTick, (_) {
+      if (mounted) _shake.forward(from: 0);
+    });
+  }
+
+  @override
+  void dispose() {
+    _worker?.dispose();
+    _shake.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,9 +66,15 @@ class GuessInput extends GetView<GameController> {
                   ),
           );
         }),
-        Obx(() {
-          final tick = controller.shakeTick.value;
-          final field = Row(
+        AnimatedBuilder(
+          animation: _shake,
+          builder: (context, child) => Transform.translate(
+            offset: Offset(
+                math.sin(_shake.value * math.pi * 6) * 8 * (1 - _shake.value),
+                0),
+            child: child,
+          ),
+          child: Row(
             children: [
               Expanded(
                 child: TextField(
@@ -70,12 +109,8 @@ class GuessInput extends GetView<GameController> {
                 ),
               ),
             ],
-          );
-          // Re-keying restarts the shake animation on every tick.
-          return field
-              .animate(key: ValueKey(tick), autoPlay: tick > 0)
-              .shakeX(amount: 8, duration: 350.ms);
-        }),
+          ),
+        ),
       ],
     );
   }
