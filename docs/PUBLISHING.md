@@ -69,3 +69,17 @@ No ads on the game screen while guessing, none during battles.
 2. New personal developer accounts must run **closed testing with ≥12 testers for 14 days** before Production access.
 3. Rebuild with real AdMob ids (step 2), bump `version: 0.0.2+2` for every new upload (build number must always increase).
 4. Firebase: if you want locked-down rules, enable Authentication → Anonymous and deploy `database.rules.secure.json`.
+
+## 6. Plan used for NearWord
+1. **Closed test (14 days)** – upload `dist/NearWord-0.0.1+1-closedtest.aab`. It is built with **Google test ads** (no dart-defines for ads, test app id), so testers can tap ads safely.
+2. **Production** – after the closed test, bump the version (`version: 0.0.2+2`; the build number must be higher than any upload) and build with the real AdMob ids:
+
+```
+flutter build appbundle --release ^
+  --dart-define=NEARWORD_RTDB_URL=https://nearword-battle-1405-default-rtdb.firebaseio.com ^
+  --dart-define=ADMOB_BANNER=ca-app-pub-7850040820402819/4483772466 ^
+  --dart-define=ADMOB_INTERSTITIAL=ca-app-pub-7850040820402819/9788070031 ^
+  --dart-define=ADMOB_REWARDED=ca-app-pub-7850040820402819/4775416509 ^
+  -PADMOB_APP_ID=ca-app-pub-7850040820402819~4942937461
+```
+Verify real ads only on a device registered as an AdMob **test device**; never tap your own live ads.

@@ -34,10 +34,35 @@ class MeTab extends GetView<StatsController> {
             colors: AppColors.heroGradient,
             child: Row(
               children: [
-                InitialAvatar(
-                  name: name.isEmpty ? '?' : name,
-                  colorIndex: 0,
-                  size: 58,
+                // White disc with a coloured letter so it reads on the blue card.
+                Container(
+                  width: 62,
+                  height: 62,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white,
+                    border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.55),
+                      width: 3,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.18),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    name.isEmpty ? '?' : name.characters.first.toUpperCase(),
+                    style: const TextStyle(
+                      color: Color(0xFF1E5BD6),
+                      fontWeight: FontWeight.w900,
+                      fontSize: 28,
+                      height: 1.0,
+                    ),
+                  ),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
@@ -85,22 +110,18 @@ class MeTab extends GetView<StatsController> {
           Row(
             children: [
               Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: () => Get.toNamed(Routes.settings),
-                  icon: const Icon(Icons.settings_rounded),
-                  label: Text('settings'.tr),
+                child: _ActionButton(
+                  icon: Icons.settings_rounded,
+                  label: 'settings'.tr,
+                  onTap: () => Get.toNamed(Routes.settings),
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
-                child: OutlinedButton.icon(
-                  onPressed: home.showHowToPlay,
-                  icon: const Icon(Icons.help_outline_rounded),
-                  label: Text(
-                    'how_to_play'.tr,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                  ),
+                child: _ActionButton(
+                  icon: Icons.help_outline_rounded,
+                  label: 'how_to_play'.tr,
+                  onTap: home.showHowToPlay,
                 ),
               ),
             ],
@@ -211,5 +232,58 @@ class MeTab extends GetView<StatsController> {
         ],
       );
     });
+  }
+}
+
+/// Bordered, evenly sized button used under the profile card.
+class _ActionButton extends StatelessWidget {
+  const _ActionButton({
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Material(
+      color: scheme.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(
+          color: scheme.primary.withValues(alpha: 0.45),
+          width: 1.5,
+        ),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: onTap,
+        child: SizedBox(
+          height: 52,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, size: 20, color: scheme.primary),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    color: scheme.onSurface,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

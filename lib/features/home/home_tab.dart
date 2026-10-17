@@ -220,6 +220,7 @@ class HomeTab extends GetView<HomeController> {
         _TileRow(
           height: tileHeight,
           left: _ModeTile(
+            order: 0,
             icon: Icons.shuffle_rounded,
             colors: const [Color(0xFF19B5C8), Color(0xFF2F80ED)],
             title: 'mode_quick'.tr,
@@ -227,6 +228,7 @@ class HomeTab extends GetView<HomeController> {
             onTap: controller.playRandom,
           ),
           right: _ModeTile(
+            order: 1,
             icon: Icons.grid_view_rounded,
             colors: const [Color(0xFF2F80ED), Color(0xFF1E5BD6)],
             title: 'mode_categories'.tr,
@@ -238,6 +240,7 @@ class HomeTab extends GetView<HomeController> {
         _TileRow(
           height: tileHeight,
           left: _ModeTile(
+            order: 2,
             icon: Icons.bolt_rounded,
             colors: AppColors.battleGradient,
             title: 'mode_battle'.tr,
@@ -246,6 +249,7 @@ class HomeTab extends GetView<HomeController> {
             onTap: () => controller.tab.value = 2,
           ),
           right: _ModeTile(
+            order: 3,
             icon: Icons.group_add_rounded,
             colors: AppColors.challengeGradient,
             title: 'mode_challenge'.tr,
@@ -339,7 +343,14 @@ class _DailyCard extends StatelessWidget {
             child: SizedBox(
               width: 190,
               height: 190,
-              child: CustomPaint(painter: _RingsPainter()),
+              child: CustomPaint(painter: _RingsPainter())
+                  .animate(onPlay: (c) => c.repeat(reverse: true))
+                  .scale(
+                    begin: const Offset(0.92, 0.92),
+                    end: const Offset(1.08, 1.08),
+                    duration: 2400.ms,
+                    curve: Curves.easeInOut,
+                  ),
             ),
           ),
           Padding(
@@ -401,7 +412,11 @@ class _DailyCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                ),
+                ).animate(onPlay: (c) => c.repeat(), delay: 1200.ms).shimmer(
+                      duration: 1600.ms,
+                      delay: 2200.ms,
+                      color: const Color(0xFF93C5FD),
+                    ),
               ],
             ),
           ),
@@ -467,6 +482,7 @@ class _ModeTile extends StatelessWidget {
     required this.subtitle,
     required this.onTap,
     this.badge,
+    this.order = 0,
   });
 
   final IconData icon;
@@ -475,6 +491,7 @@ class _ModeTile extends StatelessWidget {
   final String subtitle;
   final String? badge;
   final VoidCallback onTap;
+  final int order;
 
   @override
   Widget build(BuildContext context) {
@@ -498,7 +515,17 @@ class _ModeTile extends StatelessWidget {
                     end: Alignment.bottomRight,
                   ),
                 ),
-                child: Icon(icon, color: Colors.white),
+                child: Icon(icon, color: Colors.white)
+                    .animate(
+                      onPlay: (c) => c.repeat(reverse: true),
+                      delay: (order * 250).ms,
+                    )
+                    .moveY(
+                      begin: -1.5,
+                      end: 1.5,
+                      duration: 1600.ms,
+                      curve: Curves.easeInOut,
+                    ),
               ),
               const Spacer(),
               if (badge != null)
@@ -540,7 +567,12 @@ class _ModeTile extends StatelessWidget {
           ),
         ],
       ),
-    );
+    ).animate().fadeIn(delay: (120 + order * 90).ms, duration: 320.ms).scale(
+          begin: const Offset(0.9, 0.9),
+          delay: (120 + order * 90).ms,
+          duration: 380.ms,
+          curve: Curves.easeOutBack,
+        );
   }
 }
 
