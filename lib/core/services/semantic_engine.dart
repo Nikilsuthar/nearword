@@ -74,11 +74,11 @@ class SemanticEngine extends GetxService {
       await _bundle.loadString('$dir/secrets.txt'),
     );
     Difficulty? tier(String t) => switch (t) {
-      '0' => Difficulty.easy,
-      '1' => Difficulty.medium,
-      '2' => Difficulty.hard,
-      _ => null,
-    };
+          '0' => Difficulty.easy,
+          '1' => Difficulty.medium,
+          '2' => Difficulty.hard,
+          _ => null,
+        };
     secrets = [
       for (final line in secretLines)
         if (line.split(',').length == 3)
@@ -133,7 +133,10 @@ class SemanticEngine extends GetxService {
   List<String> categoryPool(String categoryId, WordSet set, Difficulty level) {
     final all = categoryWords[categoryId] ?? const <String>[];
     final tier = pool(set, level).toSet();
-    final filtered = [for (final w in all) if (tier.contains(w)) w];
+    final filtered = [
+      for (final w in all)
+        if (tier.contains(w)) w
+    ];
     if (filtered.length >= 40) return filtered;
     final anyLevel = [
       for (final w in all)

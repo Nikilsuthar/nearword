@@ -17,7 +17,14 @@ class BotDriver {
   final List<BattlePlayer> _bots = [];
 
   static const _names = [
-    'Nova', 'Pixel', 'Echo', 'Mango', 'Zephyr', 'Juno', 'Ember', 'Riff',
+    'Nova',
+    'Pixel',
+    'Echo',
+    'Mango',
+    'Zephyr',
+    'Juno',
+    'Ember',
+    'Riff',
   ];
 
   /// Adds [count] bots to the lobby.
@@ -47,8 +54,8 @@ class BotDriver {
     var bot = _bots[i];
     final skill = 0.35 + _random.nextDouble() * 0.4; // lower = better
     final willSolve = _random.nextDouble() < 0.65;
-    final solveAfter = (durationSec * (0.35 + _random.nextDouble() * 0.55))
-        .round();
+    final solveAfter =
+        (durationSec * (0.35 + _random.nextDouble() * 0.55)).round();
     var rank = 8000 + _random.nextInt(20000);
     var elapsed = 0;
 
@@ -57,7 +64,9 @@ class BotDriver {
       elapsed += 3 + _random.nextInt(5);
       if (elapsed >= durationSec) return;
       final improve = _random.nextDouble() < 0.7;
-      if (improve) rank = max(2, (rank * (skill + _random.nextDouble() * 0.3)).round());
+      if (improve) {
+        rank = max(2, (rank * (skill + _random.nextDouble() * 0.3)).round());
+      }
       final solves = willSolve && elapsed >= solveAfter;
       bot = bot.copyWith(
         bestRank: solves ? 1 : min(bot.bestRank, rank),

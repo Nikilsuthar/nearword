@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import '../constants/backend_config.dart';
 import '../../data/models/puzzle.dart';
 import '../utils/seeded.dart';
+import 'sfx.dart';
 import 'storage_service.dart';
 
 /// User preferences (theme, haptics, nickname) with reactive values.
@@ -16,6 +17,8 @@ class SettingsService extends GetxService {
 
   late final Rx<ThemeMode> themeMode;
   late final RxBool haptics;
+  late final RxBool sound;
+  late final RxBool music;
   late final RxString nickname;
   late final RxBool onboarded;
 
@@ -43,6 +46,8 @@ class SettingsService extends GetxService {
         .firstWhere((m) => m.name == mode, orElse: () => ThemeMode.dark)
         .obs;
     haptics = (_storage.getSetting<bool>('haptics') ?? true).obs;
+    sound = (_storage.getSetting<bool>('sound') ?? true).obs;
+    music = (_storage.getSetting<bool>('music') ?? true).obs;
     nickname = (_storage.getSetting<String>('nickname') ?? '').obs;
     onboarded = (_storage.getSetting<bool>('onboarded') ?? false).obs;
     level = Difficulty.values
@@ -76,6 +81,17 @@ class SettingsService extends GetxService {
   void setHaptics(bool value) {
     haptics.value = value;
     _storage.setSetting('haptics', value);
+  }
+
+  void setSound(bool value) {
+    sound.value = value;
+    _storage.setSetting('sound', value);
+  }
+
+  void setMusic(bool value) {
+    music.value = value;
+    _storage.setSetting('music', value);
+    Sfx.refreshMusic();
   }
 
   void setNickname(String value) {

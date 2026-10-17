@@ -99,7 +99,8 @@ class FirebaseAuthService extends GetxService {
         );
         return true;
       }
-      debugPrint('Anonymous sign-in unavailable: ${res.statusCode} ${res.body}');
+      debugPrint(
+          'Anonymous sign-in unavailable: ${res.statusCode} ${res.body}');
     } catch (e) {
       debugPrint('Auth failed: $e');
     }
@@ -114,7 +115,8 @@ class FirebaseAuthService extends GetxService {
   }) {
     _idToken = idToken;
     _refreshToken = refresh;
-    _expiry = DateTime.now().add(Duration(seconds: int.tryParse(expiresIn) ?? 3600));
+    _expiry =
+        DateTime.now().add(Duration(seconds: int.tryParse(expiresIn) ?? 3600));
     uid.value = localId;
     _storage.setSetting('fb_uid', localId);
     _storage.setSetting('fb_refresh', refresh);

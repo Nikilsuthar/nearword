@@ -161,8 +161,7 @@ class PuzzleRepository extends GetxService {
       final order = _dailyOrderFor(set, level);
       final n = dailyNumber(date);
       final word = order[(n - 1) % order.length];
-      return _build(id, PuzzleMode.daily, 'daily', set, level, word,
-          number: n);
+      return _build(id, PuzzleMode.daily, 'daily', set, level, word, number: n);
     }
     m = _rnd.firstMatch(id);
     if (m != null) {

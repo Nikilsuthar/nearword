@@ -12,9 +12,19 @@ class HintSheet extends GetView<HintsController> {
   const HintSheet({super.key});
 
   static const _items = <(HintType, IconData, String, String)>[
-    (HintType.betterWord, Icons.auto_awesome_rounded, 'hint_closer', 'hint_closer_sub'),
+    (
+      HintType.betterWord,
+      Icons.auto_awesome_rounded,
+      'hint_closer',
+      'hint_closer_sub'
+    ),
     (HintType.firstLetter, Icons.abc_rounded, 'hint_letter', 'hint_letter_sub'),
-    (HintType.wordLength, Icons.straighten_rounded, 'hint_length', 'hint_length_sub'),
+    (
+      HintType.wordLength,
+      Icons.straighten_rounded,
+      'hint_length',
+      'hint_length_sub'
+    ),
   ];
 
   Future<void> _use(HintType type, HintPayment payment) async {
@@ -40,7 +50,8 @@ class HintSheet extends GetView<HintsController> {
             children: [
               Row(
                 children: [
-                  Text('hints'.tr, style: Theme.of(context).textTheme.titleLarge),
+                  Text('hints'.tr,
+                      style: Theme.of(context).textTheme.titleLarge),
                   const Spacer(),
                   CoinText(controller.coins.value),
                 ],
@@ -56,7 +67,8 @@ class HintSheet extends GetView<HintsController> {
                   margin: const EdgeInsets.only(bottom: 10),
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: scheme.surfaceContainerHighest.withValues(alpha: 0.55),
+                    color:
+                        scheme.surfaceContainerHighest.withValues(alpha: 0.55),
                     borderRadius: BorderRadius.circular(18),
                     border: Border.all(color: scheme.outline),
                   ),
@@ -90,7 +102,8 @@ class HintSheet extends GetView<HintsController> {
                                   subtitle.tr,
                                   style: TextStyle(
                                     fontSize: 12.5,
-                                    color: scheme.onSurface.withValues(alpha: 0.65),
+                                    color: scheme.onSurface
+                                        .withValues(alpha: 0.65),
                                   ),
                                 ),
                               ],
@@ -112,10 +125,12 @@ class HintSheet extends GetView<HintsController> {
                             Expanded(
                               child: FilledButton(
                                 style: FilledButton.styleFrom(
-                                  padding: const EdgeInsets.symmetric(vertical: 12),
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 12),
                                 ),
-                                onPressed:
-                                    busy ? null : () => _use(type, HintPayment.coins),
+                                onPressed: busy
+                                    ? null
+                                    : () => _use(type, HintPayment.coins),
                                 child: Text(
                                   controller.unlimited
                                       ? 'use_free'.tr
@@ -132,11 +147,13 @@ class HintSheet extends GetView<HintsController> {
                               Expanded(
                                 child: OutlinedButton.icon(
                                   style: OutlinedButton.styleFrom(
-                                    padding: const EdgeInsets.symmetric(vertical: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
                                   ),
                                   onPressed: busy
                                       ? null
-                                      : () => _use(type, HintPayment.rewardedAd),
+                                      : () =>
+                                          _use(type, HintPayment.rewardedAd),
                                   icon: const Icon(
                                     Icons.play_circle_outline_rounded,
                                     size: 18,

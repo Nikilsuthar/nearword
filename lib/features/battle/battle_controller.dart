@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+
+import '../../core/services/sfx.dart';
 import 'package:get/get.dart';
 
 import '../../core/constants/app_constants.dart';
@@ -270,9 +272,8 @@ class BattleController extends GetxController implements BattleLink {
         code: code,
         hostId: playerId,
         kind: kind,
-        status: kind == RoomKind.challenge
-            ? RoomStatus.playing
-            : RoomStatus.lobby,
+        status:
+            kind == RoomKind.challenge ? RoomStatus.playing : RoomStatus.lobby,
         durationSec: durationSec,
         startedAt: kind == RoomKind.challenge ? now : 0,
         createdAt: now,
@@ -436,11 +437,15 @@ class BattleController extends GetxController implements BattleLink {
   void _beginCountdown() {
     phase.value = BattlePhase.countdown;
     countdown.value = countdownSeconds;
+    Sfx.play('tick');
     _countdownTimer = Timer.periodic(const Duration(seconds: 1), (t) {
       countdown.value--;
       if (countdown.value <= 0) {
         t.cancel();
+        Sfx.play('go');
         beginPlaying();
+      } else {
+        Sfx.play('tick');
       }
     });
   }

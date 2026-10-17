@@ -70,19 +70,19 @@ class _SetupViewState extends State<SetupView> {
                   .withValues(alpha: 0.7),
             ),
           ),
-
           SectionTitle('setup_language'.tr),
           Obx(
             () => ChoiceCards<String>(
               selected: settings.language.value,
               onChanged: settings.setLanguage,
               options: [
-                ChoiceOption('en', 'language_en'.tr, icon: Icons.translate_rounded),
-                ChoiceOption('hi', 'language_hi'.tr, icon: Icons.translate_rounded),
+                ChoiceOption('en', 'language_en'.tr,
+                    icon: Icons.translate_rounded),
+                ChoiceOption('hi', 'language_hi'.tr,
+                    icon: Icons.translate_rounded),
               ],
             ),
           ),
-
           SectionTitle('setup_style'.tr),
           Obx(
             () => ChoiceCards<WordSet>(
@@ -105,7 +105,6 @@ class _SetupViewState extends State<SetupView> {
               ],
             ),
           ),
-
           SectionTitle('setup_level'.tr),
           Obx(
             () => ChoiceCards<Difficulty>(
@@ -134,7 +133,6 @@ class _SetupViewState extends State<SetupView> {
               ],
             ),
           ),
-
           SectionTitle('setup_name'.tr),
           TextField(
             controller: _name,

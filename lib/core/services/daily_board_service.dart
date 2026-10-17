@@ -98,9 +98,8 @@ class DailyBoardService extends GetxService {
     required int best,
   }) async {
     if (!enabled) return false;
-    final name = _settings.nickname.value.isEmpty
-        ? 'Player'
-        : _settings.nickname.value;
+    final name =
+        _settings.nickname.value.isEmpty ? 'Player' : _settings.nickname.value;
     final row = {
       'name': name.length > 20 ? name.substring(0, 20) : name,
       'guesses': guesses,

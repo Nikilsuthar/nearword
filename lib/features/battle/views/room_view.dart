@@ -183,7 +183,8 @@ class _RoomBody extends StatelessWidget {
                     _Tag(
                       'room_stake_line'.trParams({
                         'n': '${room.stake}',
-                        'p': '${room.stake * (room.roster.isEmpty ? room.players.length : room.roster.length)}',
+                        'p':
+                            '${room.stake * (room.roster.isEmpty ? room.players.length : room.roster.length)}',
                       }),
                       color: AppColors.gold,
                     ),
@@ -254,7 +255,8 @@ class _RoomBody extends StatelessWidget {
                         () => Text(
                           finished
                               ? '—'
-                              : clockLabel((battle.remainingMs.value / 1000).ceil()),
+                              : clockLabel(
+                                  (battle.remainingMs.value / 1000).ceil()),
                           style: const TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w900,
@@ -292,7 +294,8 @@ class _RoomBody extends StatelessWidget {
               color: scheme.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: p.id == battle.playerId ? scheme.primary : scheme.outline,
+                color:
+                    p.id == battle.playerId ? scheme.primary : scheme.outline,
               ),
             ),
             child: Row(
@@ -319,7 +322,8 @@ class _RoomBody extends StatelessWidget {
                           p.solved
                               ? 'row_solved'.trParams({'n': '${p.guesses}'})
                               : p.hasGuessed
-                                  ? 'row_guesses'.trParams({'n': '${p.guesses}'})
+                                  ? 'row_guesses'
+                                      .trParams({'n': '${p.guesses}'})
                                   : 'row_none'.tr,
                           style: TextStyle(
                             fontSize: 12,
@@ -330,7 +334,8 @@ class _RoomBody extends StatelessWidget {
                   ),
                 ),
                 if (p.id == room.hostId)
-                  const Icon(Icons.star_rounded, color: AppColors.gold, size: 22),
+                  const Icon(Icons.star_rounded,
+                      color: AppColors.gold, size: 22),
                 if (p.isBot)
                   const Padding(
                     padding: EdgeInsets.only(left: 6),

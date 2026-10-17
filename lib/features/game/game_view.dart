@@ -132,13 +132,6 @@ class GameView extends GetView<GameController> {
   }
 }
 
-/// The Scaffold consumes the keyboard inset for its body, so read it from the
-/// view; MediaQuery.of keeps this widget rebuilding when the layout changes.
-bool _keyboardOpen(BuildContext context) {
-  MediaQuery.of(context);
-  return View.of(context).viewInsets.bottom > 0;
-}
-
 class _Body extends StatelessWidget {
   const _Body({required this.controller});
 
@@ -148,139 +141,145 @@ class _Body extends StatelessWidget {
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
     final battle = controller.battle;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
-      child: Column(
-        children: [
-          // Status row: guesses, best rank, timer.
-          Obx(() {
-            final best = controller.bestRank;
-            return Row(
-              children: [
-                Expanded(
-                  child: Align(
-                    alignment: Alignment.centerLeft,
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        children: [
-                          StatPill(
-                            icon: Icons.tag_rounded,
-                            label: '${controller.guessCount}',
-                            semantics: '${controller.guessCount} guesses',
-                          ),
-                          const SizedBox(width: 8),
-                          StatPill(
-                            icon: Icons.near_me_rounded,
-                            color:
-                                best == null ? null : AppColors.forRank(best),
-                            label: best == null
-                                ? 'best_none'.tr
-                                : 'best_n'.trParams({'n': '$best'}),
-                          ),
-                        ],
+    // The keyboard squeezes the body: below this height drop the List/Radar
+    // switch so more guesses fit.
+    return LayoutBuilder(builder: (context, box) {
+      final compact = box.maxHeight < 520;
+      return Padding(
+        padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+        child: Column(
+          children: [
+            // Status row: guesses, best rank, timer.
+            Obx(() {
+              final best = controller.bestRank;
+              return Row(
+                children: [
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerLeft,
+                      child: FittedBox(
+                        fit: BoxFit.scaleDown,
+                        child: Row(
+                          children: [
+                            StatPill(
+                              icon: Icons.tag_rounded,
+                              label: '${controller.guessCount}',
+                              semantics: '${controller.guessCount} guesses',
+                            ),
+                            const SizedBox(width: 8),
+                            StatPill(
+                              icon: Icons.near_me_rounded,
+                              color:
+                                  best == null ? null : AppColors.forRank(best),
+                              label: best == null
+                                  ? 'best_none'.tr
+                                  : 'best_n'.trParams({'n': '$best'}),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                if (battle != null)
-                  Obx(() {
-                    final left = (battle.remainingMs.value / 1000).ceil();
-                    return StatPill(
-                      icon: Icons.timer_rounded,
-                      color: left <= 20 ? AppColors.red : AppColors.cyan,
-                      label: clockLabel(left),
-                    );
-                  })
-                else
-                  StatPill(
-                    icon: Icons.timer_outlined,
-                    label: clockLabel(controller.elapsedSeconds.value),
-                  ),
-              ],
-            );
-          }),
-          if (battle is BattleController) ...[
-            const SizedBox(height: 10),
-            BattleStrip(battle: battle),
-          ],
-          // Letter / length hints.
-          Obx(() {
-            final hint = controller.hintSummary;
-            if (hint == null) return const SizedBox.shrink();
-            return Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Row(
-                children: [
-                  const Icon(Icons.lightbulb_rounded,
-                      size: 16, color: AppColors.gold),
-                  const SizedBox(width: 6),
-                  Text(hint,
-                      style: const TextStyle(fontWeight: FontWeight.w700)),
+                  const SizedBox(width: 8),
+                  if (battle != null)
+                    Obx(() {
+                      final left = (battle.remainingMs.value / 1000).ceil();
+                      return StatPill(
+                        icon: Icons.timer_rounded,
+                        color: left <= 20 ? AppColors.red : AppColors.cyan,
+                        label: clockLabel(left),
+                      );
+                    })
+                  else
+                    StatPill(
+                      icon: Icons.timer_outlined,
+                      label: clockLabel(controller.elapsedSeconds.value),
+                    ),
                 ],
-              ),
-            );
-          }),
-          const SizedBox(height: 12),
-          Obx(() => LatestCard(guess: controller.latest.value)),
-          // List / radar switch (hidden while typing to leave room for guesses).
-          if (!_keyboardOpen(context)) ...[
-            const SizedBox(height: 12),
-            Obx(
-              () => SegmentedButton<bool>(
-                showSelectedIcon: false,
-                style: SegmentedButton.styleFrom(
-                  visualDensity: VisualDensity.compact,
-                  side: BorderSide(color: scheme.outline),
-                ),
-                segments: [
-                  ButtonSegment(
-                    value: false,
-                    icon: Icon(Icons.view_list_rounded, size: 18),
-                    label: Text('list_tab'.tr),
-                  ),
-                  ButtonSegment(
-                    value: true,
-                    icon: Icon(Icons.radar_rounded, size: 18),
-                    label: Text('radar_tab'.tr),
-                  ),
-                ],
-                selected: {controller.radarView.value},
-                onSelectionChanged: (s) => controller.radarView.value = s.first,
-              ),
-            ),
-          ],
-          const SizedBox(height: 6),
-          Expanded(
-            child: Obx(() {
-              final list = controller.guesses.toList();
-              if (controller.radarView.value) {
-                return RadarView(
-                  guesses: list,
-                  latestWord: controller.latest.value?.word,
-                );
-              }
-              final hi = controller.highlightedWord.value;
-              return ListView.builder(
-                itemCount: list.length,
-                itemBuilder: (_, i) => GuessTile(
-                  key: ValueKey(list[i].word),
-                  guess: list[i],
-                  highlighted: list[i].word == hi,
+              );
+            }),
+            if (battle is BattleController) ...[
+              const SizedBox(height: 10),
+              BattleStrip(battle: battle),
+            ],
+            // Letter / length hints.
+            Obx(() {
+              final hint = controller.hintSummary;
+              if (hint == null) return const SizedBox.shrink();
+              return Padding(
+                padding: const EdgeInsets.only(top: 10),
+                child: Row(
+                  children: [
+                    const Icon(Icons.lightbulb_rounded,
+                        size: 16, color: AppColors.gold),
+                    const SizedBox(width: 6),
+                    Text(hint,
+                        style: const TextStyle(fontWeight: FontWeight.w700)),
+                  ],
                 ),
               );
             }),
-          ),
-          const SizedBox(height: 8),
-          // Hidden once the game ends; the Result screen opens shortly after.
-          Obx(
-            () => controller.isPlaying
-                ? const GuessInput()
-                : const SizedBox(height: 58),
-          ),
-        ],
-      ),
-    );
+            const SizedBox(height: 12),
+            Obx(() => LatestCard(guess: controller.latest.value)),
+            // List / radar switch (hidden while typing to leave room for guesses).
+            if (!compact) ...[
+              const SizedBox(height: 12),
+              Obx(
+                () => SegmentedButton<bool>(
+                  showSelectedIcon: false,
+                  style: SegmentedButton.styleFrom(
+                    visualDensity: VisualDensity.compact,
+                    side: BorderSide(color: scheme.outline),
+                  ),
+                  segments: [
+                    ButtonSegment(
+                      value: false,
+                      icon: Icon(Icons.view_list_rounded, size: 18),
+                      label: Text('list_tab'.tr),
+                    ),
+                    ButtonSegment(
+                      value: true,
+                      icon: Icon(Icons.radar_rounded, size: 18),
+                      label: Text('radar_tab'.tr),
+                    ),
+                  ],
+                  selected: {controller.radarView.value},
+                  onSelectionChanged: (s) =>
+                      controller.radarView.value = s.first,
+                ),
+              ),
+            ],
+            const SizedBox(height: 6),
+            Expanded(
+              child: Obx(() {
+                final list = controller.guesses.toList();
+                if (controller.radarView.value) {
+                  return RadarView(
+                    guesses: list,
+                    latestWord: controller.latest.value?.word,
+                  );
+                }
+                final hi = controller.highlightedWord.value;
+                return ListView.builder(
+                  itemCount: list.length,
+                  itemBuilder: (_, i) => GuessTile(
+                    key: ValueKey(list[i].word),
+                    guess: list[i],
+                    highlighted: list[i].word == hi,
+                  ),
+                );
+              }),
+            ),
+            const SizedBox(height: 8),
+            // Hidden once the game ends; the Result screen opens shortly after.
+            Obx(
+              () => controller.isPlaying
+                  ? const GuessInput()
+                  : const SizedBox(height: 58),
+            ),
+          ],
+        ),
+      );
+    });
   }
 }

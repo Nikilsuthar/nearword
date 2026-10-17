@@ -181,7 +181,9 @@ class _ChoiceCard<T> extends StatelessWidget {
                           Icon(option.icon, color: fg),
                           const SizedBox(width: 12),
                         ],
-                        Expanded(child: _texts(fg, scheme, CrossAxisAlignment.start)),
+                        Expanded(
+                            child:
+                                _texts(fg, scheme, CrossAxisAlignment.start)),
                         if (selected)
                           const Icon(Icons.check_circle_rounded,
                               color: Colors.white, size: 22),

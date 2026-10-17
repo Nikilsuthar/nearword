@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../constants/app_colors.dart';
 
@@ -23,13 +24,26 @@ class AppScaffold extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final dark = Theme.of(context).brightness == Brightness.dark;
-    return Scaffold(
+    // Status-bar icons must contrast with the page: dark icons in light mode.
+    final overlay = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: dark ? Brightness.light : Brightness.dark,
+      statusBarBrightness: dark ? Brightness.dark : Brightness.light,
+      systemNavigationBarColor:
+          dark ? const Color(0xFF0B1220) : const Color(0xFFFFFFFF),
+      systemNavigationBarIconBrightness:
+          dark ? Brightness.light : Brightness.dark,
+      systemNavigationBarContrastEnforced: false,
+    );
+    final scaffold = Scaffold(
       backgroundColor: Colors.transparent,
       extendBodyBehindAppBar: false,
       resizeToAvoidBottomInset: resizeToAvoidBottomInset,
       appBar: appBar,
       bottomNavigationBar: bottomNavigationBar,
       body: SafeArea(
+        // With a bottom bar, that bar already handles the system inset.
+        bottom: bottomNavigationBar == null,
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: maxWidth),
@@ -38,6 +52,7 @@ class AppScaffold extends StatelessWidget {
         ),
       ),
     ).withBackdrop(dark);
+    return AnnotatedRegion<SystemUiOverlayStyle>(value: overlay, child: scaffold);
   }
 }
 

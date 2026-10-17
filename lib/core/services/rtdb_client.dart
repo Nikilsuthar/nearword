@@ -39,6 +39,28 @@ class RtdbClient {
     return jsonDecode(res.body);
   }
 
+  /// Conditional read for polling: sends the ETag of the last answer and
+  /// gets `unchanged == true` (HTTP 304, no body) when nothing changed, which
+  /// keeps bandwidth tiny with many players.
+  Future<({bool unchanged, String? etag, dynamic data})> getConditional(
+    String path, {
+    String? etag,
+  }) async {
+    final res = await _client.get(await _uri(path), headers: {
+      'X-Firebase-ETag': 'true',
+      if (etag != null) 'if-none-match': etag,
+    }).timeout(timeout);
+    if (res.statusCode == 304) {
+      return (unchanged: true, etag: etag, data: null);
+    }
+    if (res.statusCode != 200) _fail('GET $path', res);
+    return (
+      unchanged: false,
+      etag: res.headers['etag'],
+      data: jsonDecode(res.body),
+    );
+  }
+
   Future<void> put(String path, Object? body) => _send('PUT', path, body);
 
   Future<void> patch(String path, Object? body) => _send('PATCH', path, body);

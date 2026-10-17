@@ -18,7 +18,8 @@ class CategoriesView extends GetView<CategoriesController> {
     final canAfford = controller.canAffordUnlock();
     final confirm = await Get.dialog<String>(
       AlertDialog(
-        title: Text('unlock_title'.trParams({'name': 'cat_${item.category.id}'.tr})),
+        title: Text(
+            'unlock_title'.trParams({'name': 'cat_${item.category.id}'.tr})),
         content: Text(
           canAfford
               ? 'unlock_afford'.trParams({'n': '${controller.unlockCost}'})
@@ -37,7 +38,8 @@ class CategoriesView extends GetView<CategoriesController> {
           if (canAfford)
             FilledButton(
               onPressed: () => Get.back(result: 'coins'),
-              child: Text('unlock_btn'.trParams({'n': '${controller.unlockCost}'})),
+              child: Text(
+                  'unlock_btn'.trParams({'n': '${controller.unlockCost}'})),
             ),
         ],
       ),
@@ -83,7 +85,8 @@ class CategoriesView extends GetView<CategoriesController> {
           ),
         ],
       ),
-      bottomNavigationBar: SafeArea(top: false, child: Ads.banner('categories')),
+      bottomNavigationBar:
+          SafeArea(top: false, child: Ads.banner('categories')),
       body: Obx(() {
         // Read the observable here, not inside the LayoutBuilder callback.
         final items = controller.items.toList();
@@ -127,7 +130,10 @@ class _CategoryCard extends StatelessWidget {
     final color = Color(
       0xFF000000 | (item.category.id.hashCode * 2654435761 & 0xFFFFFF),
     );
-    final tint = HSLColor.fromColor(color).withSaturation(0.7).withLightness(0.62).toColor();
+    final tint = HSLColor.fromColor(color)
+        .withSaturation(0.7)
+        .withLightness(0.62)
+        .toColor();
 
     return Semantics(
       button: true,
@@ -158,7 +164,8 @@ class _CategoryCard extends StatelessWidget {
                   ),
                 ),
                 if (item.locked)
-                  const Icon(Icons.lock_rounded, size: 20, color: AppColors.gold),
+                  const Icon(Icons.lock_rounded,
+                      size: 20, color: AppColors.gold),
               ],
             ),
             Column(

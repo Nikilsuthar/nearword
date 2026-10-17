@@ -1,10 +1,10 @@
 # Publishing NearWord on Google Play
 
-Version: **1.0.0 (build 1)** – first release (`version: 1.0.0+1` in `pubspec.yaml`).
+Version: **0.0.1 (build 1)** – first release (`version: 0.0.1+1` in `pubspec.yaml`).
 Package name: `com.weetech.nearword` (cannot be changed after the first upload).
 
 ## 1. Files
-- `dist/NearWord-1.0.0+1.aab` – upload this to Play Console (signed with the upload key).
+- `dist/NearWord-0.0.1+1.aab` – upload this to Play Console (signed with the upload key).
 - `android/upload-keystore.jks` + `android/key.properties` – **your upload key. Back both up** (they are git-ignored). Keep Play App Signing ON (default); if you lose the upload key you can ask Google to reset it.
 - `docs/PRIVACY_POLICY.md` – privacy policy (URL used in the app and the store form):
   https://github.com/Nikilsuthar/nearword/blob/main/docs/PRIVACY_POLICY.md
@@ -67,5 +67,5 @@ No ads on the game screen while guessing, none during battles.
 ## 5. Release checklist
 1. Internal testing track first (upload the AAB, add testers' Gmail IDs).
 2. New personal developer accounts must run **closed testing with ≥12 testers for 14 days** before Production access.
-3. Rebuild with real AdMob ids (step 2), bump `version: 1.0.1+2` for every new upload (build number must always increase).
+3. Rebuild with real AdMob ids (step 2), bump `version: 0.0.2+2` for every new upload (build number must always increase).
 4. Firebase: if you want locked-down rules, enable Authentication → Anonymous and deploy `database.rules.secure.json`.

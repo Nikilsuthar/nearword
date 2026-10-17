@@ -19,11 +19,11 @@ class PlayerStats {
     Map<String, int>? achievements,
     Set<String>? unlockedCategories,
     Map<String, int>? tempUnlocks,
-  }) : distribution = distribution ?? {},
-       winCategories = winCategories ?? {},
-       achievements = achievements ?? {},
-       unlockedCategories = unlockedCategories ?? {},
-       tempUnlocks = tempUnlocks ?? {};
+  })  : distribution = distribution ?? {},
+        winCategories = winCategories ?? {},
+        achievements = achievements ?? {},
+        unlockedCategories = unlockedCategories ?? {},
+        tempUnlocks = tempUnlocks ?? {};
 
   /// Wins + give-ups.
   int gamesPlayed;
@@ -67,52 +67,52 @@ class PlayerStats {
   }
 
   Map<String, dynamic> toJson() => {
-    'gamesPlayed': gamesPlayed,
-    'wins': wins,
-    'totalWinGuesses': totalWinGuesses,
-    'currentStreak': currentStreak,
-    'maxStreak': maxStreak,
-    'lastWinDay': lastWinDay,
-    'lastLoginDay': lastLoginDay,
-    'coins': coins,
-    'bestGuessCount': bestGuessCount,
-    'fastestWinSeconds': fastestWinSeconds,
-    'dailyWins': dailyWins,
-    'battleWins': battleWins,
-    'battlesPlayed': battlesPlayed,
-    'distribution': distribution,
-    'winCategories': winCategories.toList(),
-    'achievements': achievements,
-    'unlockedCategories': unlockedCategories.toList(),
-    'tempUnlocks': tempUnlocks,
-  };
+        'gamesPlayed': gamesPlayed,
+        'wins': wins,
+        'totalWinGuesses': totalWinGuesses,
+        'currentStreak': currentStreak,
+        'maxStreak': maxStreak,
+        'lastWinDay': lastWinDay,
+        'lastLoginDay': lastLoginDay,
+        'coins': coins,
+        'bestGuessCount': bestGuessCount,
+        'fastestWinSeconds': fastestWinSeconds,
+        'dailyWins': dailyWins,
+        'battleWins': battleWins,
+        'battlesPlayed': battlesPlayed,
+        'distribution': distribution,
+        'winCategories': winCategories.toList(),
+        'achievements': achievements,
+        'unlockedCategories': unlockedCategories.toList(),
+        'tempUnlocks': tempUnlocks,
+      };
 
   factory PlayerStats.fromJson(Map<dynamic, dynamic> j) => PlayerStats(
-    gamesPlayed: j['gamesPlayed'] as int? ?? 0,
-    wins: j['wins'] as int? ?? 0,
-    totalWinGuesses: j['totalWinGuesses'] as int? ?? 0,
-    currentStreak: j['currentStreak'] as int? ?? 0,
-    maxStreak: j['maxStreak'] as int? ?? 0,
-    lastWinDay: j['lastWinDay'] as String?,
-    lastLoginDay: j['lastLoginDay'] as String?,
-    coins: j['coins'] as int? ?? 0,
-    bestGuessCount: j['bestGuessCount'] as int?,
-    fastestWinSeconds: j['fastestWinSeconds'] as int?,
-    dailyWins: j['dailyWins'] as int? ?? 0,
-    battleWins: j['battleWins'] as int? ?? 0,
-    battlesPlayed: j['battlesPlayed'] as int? ?? 0,
-    distribution: ((j['distribution'] as Map?) ?? {}).map(
-      (k, v) => MapEntry(k as String, v as int),
-    ),
-    winCategories: ((j['winCategories'] as List?) ?? []).cast<String>().toSet(),
-    achievements: ((j['achievements'] as Map?) ?? {}).map(
-      (k, v) => MapEntry(k as String, v as int),
-    ),
-    unlockedCategories: ((j['unlockedCategories'] as List?) ?? [])
-        .cast<String>()
-        .toSet(),
-    tempUnlocks: ((j['tempUnlocks'] as Map?) ?? {}).map(
-      (k, v) => MapEntry(k as String, v as int),
-    ),
-  );
+        gamesPlayed: j['gamesPlayed'] as int? ?? 0,
+        wins: j['wins'] as int? ?? 0,
+        totalWinGuesses: j['totalWinGuesses'] as int? ?? 0,
+        currentStreak: j['currentStreak'] as int? ?? 0,
+        maxStreak: j['maxStreak'] as int? ?? 0,
+        lastWinDay: j['lastWinDay'] as String?,
+        lastLoginDay: j['lastLoginDay'] as String?,
+        coins: j['coins'] as int? ?? 0,
+        bestGuessCount: j['bestGuessCount'] as int?,
+        fastestWinSeconds: j['fastestWinSeconds'] as int?,
+        dailyWins: j['dailyWins'] as int? ?? 0,
+        battleWins: j['battleWins'] as int? ?? 0,
+        battlesPlayed: j['battlesPlayed'] as int? ?? 0,
+        distribution: ((j['distribution'] as Map?) ?? {}).map(
+          (k, v) => MapEntry(k as String, v as int),
+        ),
+        winCategories:
+            ((j['winCategories'] as List?) ?? []).cast<String>().toSet(),
+        achievements: ((j['achievements'] as Map?) ?? {}).map(
+          (k, v) => MapEntry(k as String, v as int),
+        ),
+        unlockedCategories:
+            ((j['unlockedCategories'] as List?) ?? []).cast<String>().toSet(),
+        tempUnlocks: ((j['tempUnlocks'] as Map?) ?? {}).map(
+          (k, v) => MapEntry(k as String, v as int),
+        ),
+      );
 }

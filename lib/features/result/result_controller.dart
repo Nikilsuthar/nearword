@@ -1,4 +1,6 @@
 import 'package:confetti/confetti.dart';
+
+import '../../core/services/sfx.dart';
 import 'package:get/get.dart';
 import 'package:share_plus/share_plus.dart';
 
@@ -45,7 +47,18 @@ class ResultController extends GetxController {
   @override
   void onReady() {
     super.onReady();
-    if (result.won && !result.alreadyRecorded) confetti.play();
+    if (result.won && !result.alreadyRecorded) {
+      confetti.play();
+      Sfx.play('win');
+      if (result.coinsEarned > 0) {
+        Future<void>.delayed(
+          const Duration(milliseconds: 900),
+          () => Sfx.play('coin'),
+        );
+      }
+    } else if (!result.won && !result.alreadyRecorded) {
+      Sfx.play('lose', volume: 0.7);
+    }
     if (!result.alreadyRecorded) Ads.gameFinished();
     Ads.prepareRewarded();
     if (result.mode == PuzzleMode.daily) _loadBoardPlace();

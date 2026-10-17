@@ -21,7 +21,7 @@ class RewardSummary {
 /// Pass [clock] in tests to control "today".
 class StatsRepository extends GetxService {
   StatsRepository(this._storage, {DateTime Function()? clock})
-    : _clock = clock ?? DateTime.now;
+      : _clock = clock ?? DateTime.now;
 
   final StorageService _storage;
   final DateTime Function() _clock;
@@ -182,21 +182,21 @@ class StatsRepository extends GetxService {
   }
 
   Set<String> lockedCategoryIds(Iterable<Category> categories) => {
-    for (final c in categories)
-      if (!isCategoryUnlocked(c)) c.id,
-  };
+        for (final c in categories)
+          if (!isCategoryUnlocked(c)) c.id,
+      };
 
   // --- Derived -----------------------------------------------------------------------
 
   /// Current streak as it should be shown today (0 if it has lapsed).
   int get displayStreak => StreakCalculator.displayStreak(
-    StreakState(
-      current: stats.currentStreak,
-      max: stats.maxStreak,
-      lastDay: stats.lastWinDay,
-    ),
-    _clock(),
-  );
+        StreakState(
+          current: stats.currentStreak,
+          max: stats.maxStreak,
+          lastDay: stats.lastWinDay,
+        ),
+        _clock(),
+      );
 
   void _save() {
     _publish();

@@ -30,9 +30,8 @@ class DistributionChart extends StatelessWidget {
                   Expanded(
                     child: LayoutBuilder(
                       builder: (context, c) {
-                        final fraction = maxValue == 0
-                            ? 0.0
-                            : e.value / maxValue;
+                        final fraction =
+                            maxValue == 0 ? 0.0 : e.value / maxValue;
                         return Align(
                           alignment: Alignment.centerLeft,
                           child: AnimatedContainer(

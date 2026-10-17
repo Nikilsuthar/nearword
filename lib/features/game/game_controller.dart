@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 
+import '../../core/services/sfx.dart';
 import '../../core/services/daily_board_service.dart';
 import '../../core/services/semantic_engine.dart';
 import '../../core/services/settings_service.dart';
@@ -256,6 +257,7 @@ class GameController extends GetxController with WidgetsBindingObserver {
       _flashMessage('word_unknown'.tr);
       shakeTick.value++;
       _settings?.bad();
+      Sfx.play('tap', volume: 0.6);
       return GuessResult.unknown;
     }
 
@@ -266,6 +268,7 @@ class GameController extends GetxController with WidgetsBindingObserver {
       _flashMessage('word_dup'.trParams({'w': word}));
       shakeTick.value++;
       _settings?.bad();
+      Sfx.play('tap', volume: 0.6);
       return GuessResult.duplicate;
     }
 
@@ -286,6 +289,7 @@ class GameController extends GetxController with WidgetsBindingObserver {
       return GuessResult.won;
     }
     _settings?.good();
+    Sfx.forRank(guess.rank);
     _reportBattle();
     _persist();
     return GuessResult.accepted;

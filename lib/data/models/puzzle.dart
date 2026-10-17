@@ -55,6 +55,7 @@ class Puzzle {
 
   /// Category id for category puzzles, otherwise the mode name.
   final String category;
+
   /// The word's own difficulty.
   final Difficulty difficulty;
 

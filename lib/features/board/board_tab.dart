@@ -35,7 +35,8 @@ class BoardTab extends GetView<BoardController> {
                       style: Theme.of(context).textTheme.headlineMedium,
                     ),
                     Text(
-                      'daily_label'.trParams({'n': '${controller.dailyNumber}'}),
+                      'daily_label'
+                          .trParams({'n': '${controller.dailyNumber}'}),
                       style: TextStyle(
                         color: scheme.onSurface.withValues(alpha: 0.6),
                         fontWeight: FontWeight.w700,
@@ -136,7 +137,8 @@ class BoardTab extends GetView<BoardController> {
 }
 
 class _EntryRow extends StatelessWidget {
-  const _EntryRow({required this.place, required this.entry, required this.mine});
+  const _EntryRow(
+      {required this.place, required this.entry, required this.mine});
 
   final int place;
   final DailyEntry entry;
@@ -145,7 +147,8 @@ class _EntryRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
-    final medal = switch (place) { 1 => '🥇', 2 => '🥈', 3 => '🥉', _ => '#$place' };
+    final medal =
+        switch (place) { 1 => '🥇', 2 => '🥈', 3 => '🥉', _ => '#$place' };
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 4),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
@@ -227,7 +230,8 @@ class _OffCard extends StatelessWidget {
 }
 
 class _Message extends StatelessWidget {
-  const _Message({required this.icon, required this.text, this.sub, this.action});
+  const _Message(
+      {required this.icon, required this.text, this.sub, this.action});
 
   final IconData icon;
   final String text;

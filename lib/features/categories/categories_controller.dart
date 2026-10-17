@@ -54,7 +54,8 @@ class CategoriesController extends GetxController {
         CategoryItem(
           category: c,
           solved: done.where((id) => id.startsWith('cat-${c.id}-')).length,
-          total: _repo.sizeOf(c.id, _settings.wordSet.value, _settings.level.value),
+          total: _repo.sizeOf(
+              c.id, _settings.wordSet.value, _settings.level.value),
           locked: !_stats.isCategoryUnlocked(c),
         ),
     ]);

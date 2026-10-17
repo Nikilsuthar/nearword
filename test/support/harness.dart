@@ -370,7 +370,7 @@ String get dailySecret => repo
 /// Opens a bottom navigation tab by its (English) label.
 Future<void> openTab(WidgetTester t, String label) async {
   await t.tap(find.descendant(
-    of: find.byType(NavigationBar),
+    of: find.byKey(const Key('nav_bar')),
     matching: find.text(label),
   ));
   await pump(t, 500);

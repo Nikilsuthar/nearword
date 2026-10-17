@@ -148,7 +148,8 @@ class ResultView extends GetView<ResultController> {
                                 onPressed: controller.doubling.value
                                     ? null
                                     : () async {
-                                        final ok = await controller.doubleCoins();
+                                        final ok =
+                                            await controller.doubleCoins();
                                         if (!ok) {
                                           Get.snackbar(
                                             'ok'.tr,
@@ -184,14 +185,17 @@ class ResultView extends GetView<ResultController> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'achievement_unlocked'.trParams({'t': 'ach_${a.id}_t'.tr}),
+                                'achievement_unlocked'
+                                    .trParams({'t': 'ach_${a.id}_t'.tr}),
                                 style: const TextStyle(
                                   fontWeight: FontWeight.w800,
                                 ),
                               ),
                               Text(
-                                  '${'ach_${a.id}_d'.tr}  ${'coins_added'.trParams({'n': '${a.rewardCoins}'})}',
-                                ),
+                                '${'ach_${a.id}_d'.tr}  ${'coins_added'.trParams({
+                                      'n': '${a.rewardCoins}'
+                                    })}',
+                              ),
                             ],
                           ),
                         ),
@@ -209,7 +213,8 @@ class ResultView extends GetView<ResultController> {
                       borderColor: AppColors.green,
                       onTap: () {
                         Get.find<HomeController>().tab.value = 1;
-                        Get.until((route) => route.settings.name == Routes.home);
+                        Get.until(
+                            (route) => route.settings.name == Routes.home);
                       },
                       child: Row(
                         children: [
@@ -221,8 +226,7 @@ class ResultView extends GetView<ResultController> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'board_your_place'
-                                      .trParams({'n': '$place'}),
+                                  'board_your_place'.trParams({'n': '$place'}),
                                   style: const TextStyle(
                                     fontWeight: FontWeight.w900,
                                     fontSize: 16,
@@ -256,12 +260,12 @@ class ResultView extends GetView<ResultController> {
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
-                          color: AppColors.forRank(i + 2)
-                              .withValues(alpha: 0.16),
+                          color:
+                              AppColors.forRank(i + 2).withValues(alpha: 0.16),
                           borderRadius: BorderRadius.circular(20),
                           border: Border.all(
-                            color: AppColors.forRank(i + 2)
-                                .withValues(alpha: 0.5),
+                            color:
+                                AppColors.forRank(i + 2).withValues(alpha: 0.5),
                           ),
                         ),
                         child: Text(
@@ -284,7 +288,8 @@ class ResultView extends GetView<ResultController> {
               const SizedBox(height: 12),
               FilledButton(
                 onPressed: controller.nextPuzzle,
-                child: Text(controller.nextLabel.$1.trParams(controller.nextLabel.$2)),
+                child: Text(
+                    controller.nextLabel.$1.trParams(controller.nextLabel.$2)),
               ),
               const SizedBox(height: 4),
               TextButton(

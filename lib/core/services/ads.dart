@@ -15,7 +15,8 @@ class Ads {
 
   static StorageService? _storage;
 
-  static bool get _supported => !kIsWeb && (Platform.isAndroid || Platform.isIOS);
+  static bool get _supported =>
+      !kIsWeb && (Platform.isAndroid || Platform.isIOS);
 
   static bool get adsRemoved => _storage?.adsRemoved ?? false;
 

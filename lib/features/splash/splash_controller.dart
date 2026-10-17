@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/services/ads.dart';
+import '../../core/services/sfx.dart';
 import '../../core/services/daily_board_service.dart';
 import '../../core/services/firebase_auth_service.dart';
 import '../../core/services/semantic_engine.dart';
@@ -33,7 +34,8 @@ class SplashController extends GetxController {
         () => StorageService().init(),
         permanent: true,
       );
-      final settings = Get.put(SettingsService(storage).init(), permanent: true);
+      final settings =
+          Get.put(SettingsService(storage).init(), permanent: true);
       Get.updateLocale(Locale(settings.language.value));
       Get.changeThemeMode(settings.themeMode.value);
 
@@ -46,8 +48,10 @@ class SplashController extends GetxController {
         permanent: true,
       );
       final stats = Get.put(StatsRepository(storage).init(), permanent: true);
-      final auth = Get.put(FirebaseAuthService(storage).init(), permanent: true);
-      Get.put(DailyBoardService(storage, settings, auth: auth), permanent: true);
+      final auth =
+          Get.put(FirebaseAuthService(storage).init(), permanent: true);
+      Get.put(DailyBoardService(storage, settings, auth: auth),
+          permanent: true);
       Get.put(
         BattleController(
           settings: settings,
@@ -66,6 +70,7 @@ class SplashController extends GetxController {
       final spent = DateTime.now().difference(started);
       const minimum = Duration(milliseconds: 1400);
       if (spent < minimum) await Future<void>.delayed(minimum - spent);
+      Sfx.startMusic();
       Get.offAllNamed(settings.setupDone.value ? Routes.home : Routes.setup);
     } catch (e) {
       error.value = 'start_error';

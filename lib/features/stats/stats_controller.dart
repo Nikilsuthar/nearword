@@ -26,7 +26,7 @@ class StatsController extends GetxController {
 
   /// (bucket label, win count) in display order.
   List<MapEntry<String, int>> get distribution => [
-    for (final b in PlayerStats.buckets)
-      MapEntry(b, stats.distribution[b] ?? 0),
-  ];
+        for (final b in PlayerStats.buckets)
+          MapEntry(b, stats.distribution[b] ?? 0),
+      ];
 }

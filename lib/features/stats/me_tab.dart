@@ -188,7 +188,8 @@ class MeTab extends GetView<StatsController> {
                               Text(
                                 'ach_${a.id}_d'.tr,
                                 style: theme.textTheme.bodySmall?.copyWith(
-                                  color: scheme.onSurface.withValues(alpha: 0.65),
+                                  color:
+                                      scheme.onSurface.withValues(alpha: 0.65),
                                 ),
                               ),
                             ],

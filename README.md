@@ -8,6 +8,7 @@ A word-guessing game: every guess is ranked by **meaning** (GloVe embeddings, co
 - **Word style**: Regular or India (everyday Indian words), asked on first launch and changeable in Settings.
 - **Battles**: live rooms (share a 5-letter code) and challenges. Creator picks level, timer and **coin stake**.
   Winner takes the pot; if nobody solves it in time the nearest player gets 50% of the pot and the others get 50% of their stake back.
+- **Sound**: synthesised sound effects and background music (toggle in Settings; `python tools/make_sounds.py` regenerates them).
 - **Hindi / English** UI, light + dark theme, responsive layouts with SafeArea.
 - **Ads** handled by the [`safe_ads`](https://pub.dev/packages/safe_ads) package (banner, interstitial, rewarded, consent).
 
@@ -27,4 +28,4 @@ Without the URL the app works offline (practice battles only; no daily board or 
 `python tools/build_embeddings.py` rebuilds `assets/data/*` (vocab, vectors, tiers, categories).
 
 ## Tests
-`flutter test` (unit, controller, widget flows in light and dark). `NEARWORD_RTDB_URL=... flutter test test/rtdb_live_test.dart` runs against a real database. `ci/ci.yml` is the CI workflow (move to `.github/workflows/`).
+`flutter test` (unit, controller, widget flows in light and dark). `NEARWORD_RTDB_URL=... flutter test test/rtdb_live_test.dart` runs against a real database. See `docs/PUBLISHING.md` (Play Store steps and answers) and `docs/PRIVACY_POLICY.md`. `ci/ci.yml` is the CI workflow (move to `.github/workflows/`).

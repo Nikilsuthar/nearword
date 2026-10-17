@@ -47,15 +47,19 @@ class StorageService extends GetxService {
   static const _recentMax = 400;
 
   Set<String> recentSecrets() =>
-      (getSetting<List<dynamic>>(_recentKey) ?? const []).cast<String>().toSet();
+      (getSetting<List<dynamic>>(_recentKey) ?? const [])
+          .cast<String>()
+          .toSet();
 
   void addRecentSecret(String word) {
-    final list =
-        (getSetting<List<dynamic>>(_recentKey) ?? const []).cast<String>().toList()
-          ..remove(word)
-          ..add(word);
-    final trimmed =
-        list.length > _recentMax ? list.sublist(list.length - _recentMax) : list;
+    final list = (getSetting<List<dynamic>>(_recentKey) ?? const [])
+        .cast<String>()
+        .toList()
+      ..remove(word)
+      ..add(word);
+    final trimmed = list.length > _recentMax
+        ? list.sublist(list.length - _recentMax)
+        : list;
     setSetting(_recentKey, trimmed);
   }
 
@@ -73,7 +77,9 @@ class StorageService extends GetxService {
     final raw = getSetting<String>(_escrowKey);
     if (raw == null) return {};
     final m = jsonDecode(raw) as Map<String, dynamic>;
-    return {for (final e in m.entries) e.key: (e.value as Map).cast<String, dynamic>()};
+    return {
+      for (final e in m.entries) e.key: (e.value as Map).cast<String, dynamic>()
+    };
   }
 
   void setEscrow(String code, Map<String, dynamic> info) {
@@ -90,11 +96,13 @@ class StorageService extends GetxService {
       (getSetting<List<dynamic>>(_paidKey) ?? const []).contains(code);
 
   void markRoomPaid(String code) {
-    final list =
-        (getSetting<List<dynamic>>(_paidKey) ?? const []).cast<String>().toList();
+    final list = (getSetting<List<dynamic>>(_paidKey) ?? const [])
+        .cast<String>()
+        .toList();
     if (list.contains(code)) return;
     list.add(code);
-    setSetting(_paidKey, list.length > 200 ? list.sublist(list.length - 200) : list);
+    setSetting(
+        _paidKey, list.length > 200 ? list.sublist(list.length - 200) : list);
   }
 
   // --- Purchase flags (set by the IAP service in Phase 5) -----------------------

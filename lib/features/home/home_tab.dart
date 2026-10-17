@@ -67,8 +67,8 @@ class HomeTab extends GetView<HomeController> {
                 icon: Icons.local_fire_department_rounded,
                 color: AppColors.saffron,
                 label: '${controller.streak.value}',
-                semantics: 'streak_n'
-                    .trParams({'n': '${controller.streak.value}'}),
+                semantics:
+                    'streak_n'.trParams({'n': '${controller.streak.value}'}),
               ),
             ),
             const SizedBox(width: 6),
@@ -77,7 +77,8 @@ class HomeTab extends GetView<HomeController> {
                 icon: Icons.monetization_on_rounded,
                 color: AppColors.gold,
                 label: '${controller.coins.value}',
-                semantics: 'coins_n'.trParams({'n': '${controller.coins.value}'}),
+                semantics:
+                    'coins_n'.trParams({'n': '${controller.coins.value}'}),
               ),
             ),
             IconButton(
@@ -101,7 +102,10 @@ class HomeTab extends GetView<HomeController> {
             ),
             onTap: controller.playDaily,
           ),
-        ).animate().fadeIn(delay: 60.ms).slideY(begin: 0.05, curve: Curves.easeOut),
+        )
+            .animate()
+            .fadeIn(delay: 60.ms)
+            .slideY(begin: 0.05, curve: Curves.easeOut),
         const SizedBox(height: 12),
 
         // --- Board preview ------------------------------------------------------
@@ -151,7 +155,8 @@ class HomeTab extends GetView<HomeController> {
                               list[i].name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
-                              style: const TextStyle(fontWeight: FontWeight.w700),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.w700),
                             ),
                           ),
                           Text(
@@ -259,7 +264,8 @@ class HomeTab extends GetView<HomeController> {
             child: Row(
               children: [
                 Expanded(
-                  child: _Mini(value: '${s.gamesPlayed}', label: 'stat_played'.tr),
+                  child:
+                      _Mini(value: '${s.gamesPlayed}', label: 'stat_played'.tr),
                 ),
                 Expanded(
                   child: _Mini(
@@ -431,7 +437,8 @@ class _RingsPainter extends CustomPainter {
 }
 
 class _TileRow extends StatelessWidget {
-  const _TileRow({required this.height, required this.left, required this.right});
+  const _TileRow(
+      {required this.height, required this.left, required this.right});
 
   final double height;
   final Widget left;
@@ -496,7 +503,8 @@ class _ModeTile extends StatelessWidget {
               const Spacer(),
               if (badge != null)
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                   decoration: BoxDecoration(
                     color: AppColors.coral,
                     borderRadius: BorderRadius.circular(10),
@@ -559,7 +567,8 @@ class _Mini extends StatelessWidget {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             fontSize: 12,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ],

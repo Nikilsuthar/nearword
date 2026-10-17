@@ -143,8 +143,10 @@ class _RadarPainter extends CustomPainter {
     final line = Paint()
       ..color = ringColor
       ..strokeWidth = 1;
-    canvas.drawLine(Offset(c.dx - radius, c.dy), Offset(c.dx + radius, c.dy), line);
-    canvas.drawLine(Offset(c.dx, c.dy - radius), Offset(c.dx, c.dy + radius), line);
+    canvas.drawLine(
+        Offset(c.dx - radius, c.dy), Offset(c.dx + radius, c.dy), line);
+    canvas.drawLine(
+        Offset(c.dx, c.dy - radius), Offset(c.dx, c.dy + radius), line);
 
     // Target at the centre.
     final ping = Tween<double>(begin: 6, end: 26).transform(pulse);

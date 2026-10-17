@@ -38,7 +38,8 @@ const Map<String, String> enStrings = {
 
   // --- setup
   'setup_title': "Let's set up your game",
-  'setup_sub': 'Pick how you want to play. You can change this any time in Settings.',
+  'setup_sub':
+      'Pick how you want to play. You can change this any time in Settings.',
   'setup_language': 'Language',
   'setup_style': 'Word style',
   'setup_level': 'Level',
@@ -106,7 +107,8 @@ const Map<String, String> enStrings = {
   'word_dup': 'You already guessed "@w".',
   'give_up_title': 'Give up?',
   'give_up_body': 'The secret word will be revealed.',
-  'give_up_body_battle': 'You will stop guessing, but your best rank still counts.',
+  'give_up_body_battle':
+      'You will stop guessing, but your best rank still counts.',
   'keep_playing': 'Keep playing',
   'give_up': 'Give up',
   'leave_battle_title': 'Leave the room?',
@@ -143,7 +145,8 @@ const Map<String, String> enStrings = {
   'free_ad': 'Free · ad',
   'hint_pro': 'Pro Pass: unlimited free hints',
   'hint_err_unavailable': 'This hint is not available right now.',
-  'hint_err_coins': 'Not enough coins. Win puzzles or watch an ad for a free hint.',
+  'hint_err_coins':
+      'Not enough coins. Win puzzles or watch an ad for a free hint.',
   'hint_err_ad': 'Ad not available right now. Please try again later.',
 
   // --- result
@@ -241,6 +244,12 @@ const Map<String, String> enStrings = {
   'theme_dark': 'Dark',
   'theme_light': 'Light',
   'theme_auto': 'Auto',
+  'sound_fx': 'Sound effects',
+  'sound_fx_sub': 'Clicks, hints and win jingles',
+  'music_bg': 'Background music',
+  'music_bg_sub': 'Soft music while you play',
+  'winning_word': 'Winning word',
+  'top3_words': 'Closest words',
   'haptics': 'Haptic feedback',
   'haptics_sub': 'Vibrate on guesses and wins',
   'set_online': 'Online',
@@ -253,7 +262,8 @@ const Map<String, String> enStrings = {
   'db_denied':
       'Server reachable, but permission denied. Publish the database rules (see README).',
   'db_notfound': 'Database not found. Check the URL.',
-  'db_unreachable': 'Could not reach the server. Check the URL and your internet.',
+  'db_unreachable':
+      'Could not reach the server. Check the URL and your internet.',
   'db_none': 'No server URL set.',
   'db_bad_url': 'Enter the full https:// database URL.',
   'set_help': 'Help',
@@ -304,7 +314,8 @@ const Map<String, String> enStrings = {
   'room_level': 'Level',
   'room_style': 'Word style',
   'your_coins': 'Your coins: @n',
-  'online_needed': 'Online play needs the server URL. Add it in Settings > Online.',
+  'online_needed':
+      'Online play needs the server URL. Add it in Settings > Online.',
   'online_needed_cta': 'Open settings',
   'lobby': 'Lobby',
   'practice_room': 'PRACTICE ROOM',
@@ -332,12 +343,14 @@ const Map<String, String> enStrings = {
   'payout_won': 'You won @n coins!',
   'payout_back': 'You got @n coins back',
   'payout_none': 'No coins this time',
-  'payout_nearest_note': 'Nobody found the word, so the nearest player got half the pot.',
+  'payout_nearest_note':
+      'Nobody found the word, so the nearest player got half the pot.',
   'payout_solved_note': 'Solved! The winner takes the whole pot.',
   'challenge_open': 'Challenge open',
   'time_left': 'Time left',
   'play_now': 'Play now',
-  'play_again_note': 'You can open the game again any time before the timer ends.',
+  'play_again_note':
+      'You can open the game again any time before the timer ends.',
   'end_now': 'End challenge now',
   'challenge_closed': 'Challenge finished',
   'challenge_share':

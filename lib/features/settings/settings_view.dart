@@ -172,6 +172,39 @@ class _SettingsViewState extends State<SettingsView> {
             ),
           ),
 
+          const SizedBox(height: 10),
+          SoftCard(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            child: Obx(
+              () => SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                title: Text(
+                  'sound_fx'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                subtitle: Text('sound_fx_sub'.tr),
+                value: s.sound.value,
+                onChanged: s.setSound,
+              ),
+            ),
+          ),
+          const SizedBox(height: 10),
+          SoftCard(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            child: Obx(
+              () => SwitchListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 8),
+                title: Text(
+                  'music_bg'.tr,
+                  style: const TextStyle(fontWeight: FontWeight.w700),
+                ),
+                subtitle: Text('music_bg_sub'.tr),
+                value: s.music.value,
+                onChanged: s.setMusic,
+              ),
+            ),
+          ),
+
           // Only developer builds (no baked-in server) can edit the server URL.
           if (BackendConfig.defaultUrl.trim().isEmpty) ...[
             _section(context, 'set_online'.tr),
@@ -305,7 +338,9 @@ class _ServerCardState extends State<_ServerCard> {
     setState(() {
       _ok = err == null;
       _message = err ??
-          (widget.settings.backendUrl.value.isEmpty ? 'db_removed' : 'db_saved');
+          (widget.settings.backendUrl.value.isEmpty
+              ? 'db_removed'
+              : 'db_saved');
       if (err == null) _url.text = widget.settings.backendUrl.value;
     });
   }

@@ -38,7 +38,8 @@ const Map<String, String> hiStrings = {
 
   // --- setup
   'setup_title': 'अपना खेल तैयार करें',
-  'setup_sub': 'चुनें कि आप कैसे खेलना चाहते हैं। इसे कभी भी सेटिंग्स में बदल सकते हैं।',
+  'setup_sub':
+      'चुनें कि आप कैसे खेलना चाहते हैं। इसे कभी भी सेटिंग्स में बदल सकते हैं।',
   'setup_language': 'भाषा',
   'setup_style': 'शब्दों का प्रकार',
   'setup_level': 'स्तर',
@@ -106,7 +107,8 @@ const Map<String, String> hiStrings = {
   'word_dup': 'आप "@w" पहले ही आज़मा चुके हैं।',
   'give_up_title': 'हार मान लें?',
   'give_up_body': 'गुप्त शब्द दिखा दिया जाएगा।',
-  'give_up_body_battle': 'आपका अनुमान रुक जाएगा, पर आपकी सबसे अच्छी रैंक गिनी जाएगी।',
+  'give_up_body_battle':
+      'आपका अनुमान रुक जाएगा, पर आपकी सबसे अच्छी रैंक गिनी जाएगी।',
   'keep_playing': 'खेलते रहें',
   'give_up': 'हार मानें',
   'leave_battle_title': 'रूम छोड़ें?',
@@ -132,7 +134,8 @@ const Map<String, String> hiStrings = {
   // --- hints
   'hints': 'संकेत',
   'hint_closer': 'ज़्यादा करीबी शब्द दिखाएँ',
-  'hint_closer_sub': 'आपके सबसे अच्छे अनुमान से बेहतर रैंक वाला एक शब्द जोड़ता है।',
+  'hint_closer_sub':
+      'आपके सबसे अच्छे अनुमान से बेहतर रैंक वाला एक शब्द जोड़ता है।',
   'hint_letter': 'पहला अक्षर',
   'hint_letter_sub': 'गुप्त शब्द का पहला अक्षर दिखाता है।',
   'hint_length': 'शब्द की लंबाई',
@@ -143,7 +146,8 @@ const Map<String, String> hiStrings = {
   'free_ad': 'मुफ़्त · विज्ञापन',
   'hint_pro': 'प्रो पास: असीमित मुफ़्त संकेत',
   'hint_err_unavailable': 'यह संकेत अभी उपलब्ध नहीं है।',
-  'hint_err_coins': 'सिक्के कम हैं। पहेलियाँ जीतें या मुफ़्त संकेत के लिए विज्ञापन देखें।',
+  'hint_err_coins':
+      'सिक्के कम हैं। पहेलियाँ जीतें या मुफ़्त संकेत के लिए विज्ञापन देखें।',
   'hint_err_ad': 'अभी विज्ञापन उपलब्ध नहीं है। कृपया बाद में कोशिश करें।',
 
   // --- result
@@ -171,9 +175,9 @@ const Map<String, String> hiStrings = {
   'cat_words': '@n शब्द',
   'cat_solved': '@s हल · @n शब्द',
   'unlock_title': '@name अनलॉक करें?',
-  'unlock_afford': 'इस श्रेणी को हमेशा के लिए खोलने के लिए @n सिक्के खर्च करें।',
-  'unlock_need':
-      'आपको @n सिक्के चाहिए। पहेलियाँ जीतें और रोज़ का बोनस लें।',
+  'unlock_afford':
+      'इस श्रेणी को हमेशा के लिए खोलने के लिए @n सिक्के खर्च करें।',
+  'unlock_need': 'आपको @n सिक्के चाहिए। पहेलियाँ जीतें और रोज़ का बोनस लें।',
   'free_24h': '24 घंटे मुफ़्त',
   'unlock_btn': 'अनलॉक (@n)',
   'unlocked_title': 'अनलॉक हुआ',
@@ -241,6 +245,12 @@ const Map<String, String> hiStrings = {
   'theme_dark': 'डार्क',
   'theme_light': 'लाइट',
   'theme_auto': 'ऑटो',
+  'sound_fx': 'ध्वनि प्रभाव',
+  'sound_fx_sub': 'क्लिक, संकेत और जीत की धुन',
+  'music_bg': 'बैकग्राउंड संगीत',
+  'music_bg_sub': 'खेलते समय हल्का संगीत',
+  'winning_word': 'जीतने वाला शब्द',
+  'top3_words': 'सबसे करीबी शब्द',
   'haptics': 'कंपन',
   'haptics_sub': 'अनुमान और जीत पर कंपन',
   'set_online': 'ऑनलाइन',
@@ -304,7 +314,8 @@ const Map<String, String> hiStrings = {
   'room_level': 'स्तर',
   'room_style': 'शब्दों का प्रकार',
   'your_coins': 'आपके सिक्के: @n',
-  'online_needed': 'ऑनलाइन खेलने के लिए सर्वर URL चाहिए। सेटिंग्स > ऑनलाइन में डालें।',
+  'online_needed':
+      'ऑनलाइन खेलने के लिए सर्वर URL चाहिए। सेटिंग्स > ऑनलाइन में डालें।',
   'online_needed_cta': 'सेटिंग्स खोलें',
   'lobby': 'लॉबी',
   'practice_room': 'अभ्यास रूम',
@@ -338,7 +349,8 @@ const Map<String, String> hiStrings = {
   'challenge_open': 'चैलेंज चालू है',
   'time_left': 'बचा समय',
   'play_now': 'अभी खेलें',
-  'play_again_note': 'टाइमर खत्म होने से पहले आप कभी भी खेल फिर से खोल सकते हैं।',
+  'play_again_note':
+      'टाइमर खत्म होने से पहले आप कभी भी खेल फिर से खोल सकते हैं।',
   'end_now': 'चैलेंज अभी खत्म करें',
   'challenge_closed': 'चैलेंज खत्म',
   'challenge_share':

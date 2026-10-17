@@ -121,7 +121,7 @@ class MemoryBattleBackend implements BattleBackend {
 class RtdbBattleBackend implements BattleBackend {
   RtdbBattleBackend(
     RtdbClient client, {
-    this.pollInterval = const Duration(milliseconds: 1200),
+    this.pollInterval = const Duration(milliseconds: 2000),
   }) : _db = client;
 
   final RtdbClient _db;
@@ -164,11 +164,15 @@ class RtdbBattleBackend implements BattleBackend {
   Stream<BattleRoom?> watchRoom(String code) {
     Timer? timer;
     String? last;
+    String? etag;
     late StreamController<BattleRoom?> controller;
 
     Future<void> poll() async {
       try {
-        final raw = await _db.get('rooms/$code');
+        final res = await _db.getConditional('rooms/$code', etag: etag);
+        if (res.unchanged) return;
+        etag = res.etag;
+        final raw = res.data;
         final encoded = raw?.toString();
         if (encoded != last && !controller.isClosed) {
           last = encoded;

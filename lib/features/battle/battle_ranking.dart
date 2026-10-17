@@ -87,7 +87,8 @@ class RoomEconomy {
   }) {
     if (roster.isEmpty) return const RoomResult(kind: 'none');
     final pot = stake * roster.length;
-    final order = BattleRanking.standings(roster, fewestGuessesFirst: challenge);
+    final order =
+        BattleRanking.standings(roster, fewestGuessesFirst: challenge);
 
     if (order.first.solved) {
       return RoomResult(
@@ -101,7 +102,10 @@ class RoomEconomy {
     if (!order.first.hasGuessed) {
       return RoomResult(
         kind: 'none',
-        payouts: {if (half > 0) for (final p in roster) p.id: half},
+        payouts: {
+          if (half > 0)
+            for (final p in roster) p.id: half
+        },
       );
     }
     final nearest = order.first;

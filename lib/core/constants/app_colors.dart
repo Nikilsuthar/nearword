@@ -35,8 +35,14 @@ class AppColors {
   static const Color outlineLight = Color(0xFFD3DDEE);
 
   /// Hero gradients.
-  static const List<Color> heroGradient = [Color(0xFF2F80ED), Color(0xFF13A8C4)];
-  static const List<Color> battleGradient = [Color(0xFFFF9F1C), Color(0xFFFF6B5B)];
+  static const List<Color> heroGradient = [
+    Color(0xFF2F80ED),
+    Color(0xFF13A8C4)
+  ];
+  static const List<Color> battleGradient = [
+    Color(0xFFFF9F1C),
+    Color(0xFFFF6B5B)
+  ];
   static const List<Color> challengeGradient = [
     Color(0xFF13A8C4),
     Color(0xFF2BD67B),

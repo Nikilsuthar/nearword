@@ -79,7 +79,8 @@ class _FriendsTabState extends State<FriendsTab> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 24),
       children: [
-        Text('friends_title'.tr, style: Theme.of(context).textTheme.headlineMedium),
+        Text('friends_title'.tr,
+            style: Theme.of(context).textTheme.headlineMedium),
         const SizedBox(height: 14),
 
         // Nickname needed for rooms.
@@ -188,7 +189,8 @@ class _FriendsTabState extends State<FriendsTab> {
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 'or_offline'.tr,
-                style: TextStyle(color: scheme.onSurface.withValues(alpha: 0.55)),
+                style:
+                    TextStyle(color: scheme.onSurface.withValues(alpha: 0.55)),
               ),
             ),
             Expanded(child: Divider(color: scheme.outline)),
@@ -393,9 +395,8 @@ class _CreateRoomSheetState extends State<CreateRoomSheet> {
                               size: 16, color: AppColors.gold),
                       label: Text(s == 0 ? 'stake_free'.tr : '$s'),
                       selected: stake == s,
-                      onSelected: s > coins
-                          ? null
-                          : (_) => setState(() => stake = s),
+                      onSelected:
+                          s > coins ? null : (_) => setState(() => stake = s),
                     ),
                 ],
               );

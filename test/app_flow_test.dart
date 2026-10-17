@@ -92,7 +92,7 @@ void main() {
         await tapText(t, 'Dark');
         await tapText(t, 'Auto');
         await tapText(t, 'Dark');
-        await t.tap(find.byType(Switch));
+        await t.tap(find.byType(Switch).first);
         await pump(t);
         expect(settings.haptics.value, isFalse);
 
@@ -112,12 +112,10 @@ void main() {
 
       testWidgets('hindi: every tab, settings and the game render', (t) async {
         await boot(t, mode: mode, language: 'hi');
-        final nav = find.byType(NavigationBar);
-        final labels = t
-            .widgetList<NavigationDestination>(
-                find.descendant(of: nav, matching: find.byType(NavigationDestination)))
-            .map((d) => d.label)
-            .toList();
+        final nav = find.byKey(const Key('nav_bar'));
+        final labels = [
+          for (final k in ['tab_home', 'tab_rank', 'tab_play', 'tab_me']) k.tr
+        ];
         expect(labels.length, 4);
         for (final l in labels) {
           await t.tap(find.descendant(of: nav, matching: find.text(l)));

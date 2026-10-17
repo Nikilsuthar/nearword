@@ -95,7 +95,8 @@ class HomeController extends GetxController {
     // Streak can lapse at midnight even without new data.
     _stats.streak.value = _stats.displayStreak;
     dailyNumber.value = _repo.dailyNumber(_repo.now);
-    final id = _repo.todaysDailyId(settings.wordSet.value, settings.level.value);
+    final id =
+        _repo.todaysDailyId(settings.wordSet.value, settings.level.value);
     dailyId.value = id;
     final saved = _storage.loadGame(id);
     dailyGuesses.value = saved?.guesses.length ?? 0;
@@ -117,7 +118,9 @@ class HomeController extends GetxController {
     }
     try {
       final list = await board.top(
-        _repo.todaysDailyId(settings.wordSet.value, settings.level.value).substring(6, 16),
+        _repo
+            .todaysDailyId(settings.wordSet.value, settings.level.value)
+            .substring(6, 16),
         settings.wordSet.value,
         settings.level.value,
         limit: 3,
