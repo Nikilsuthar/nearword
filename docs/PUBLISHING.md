@@ -7,7 +7,7 @@ Package name: `com.nikhilsuthar.nearword` (cannot be changed after the first upl
 - `dist/NearWord-0.0.1+1.aab` – upload this to Play Console (signed with the upload key).
 - `android/upload-keystore.jks` + `android/key.properties` – **your upload key. Back both up** (they are git-ignored). Keep Play App Signing ON (default); if you lose the upload key you can ask Google to reset it.
 - `docs/PRIVACY_POLICY.md` – privacy policy (URL used in the app and the store form):
-  https://github.com/Nikilsuthar/nearword/blob/main/docs/PRIVACY_POLICY.md
+  https://nearword-battle-1405.web.app/privacy-policy
 
 ## 2. Real ads (do this before the production build)
 The AAB in `dist/` still shows **Google test ads**. Create in AdMob (apps.admob.com): one Android app, then one **Banner**, one **Interstitial**, one **Rewarded** ad unit. Then build:

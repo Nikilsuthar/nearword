@@ -1,7 +1,7 @@
 /// App-wide constants. Rank thresholds follow the game spec.
 class AppConstants {
   static const String privacyPolicyUrl =
-      'https://github.com/Nikilsuthar/nearword/blob/main/docs/PRIVACY_POLICY.md';
+      'https://nearword-battle-1405.web.app/privacy-policy';
 
   AppConstants._();
 
