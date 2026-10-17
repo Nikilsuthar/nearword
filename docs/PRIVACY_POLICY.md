@@ -2,7 +2,7 @@
 
 **Effective date:** 17 October 2026 · **Last updated:** 17 October 2026
 
-NearWord (“the app”, “we”, “us”) is a word-guessing game for Android published by **Weetech**.
+NearWord (“the app”, “we”, “us”) is a word-guessing game for Android published by **Nikhil Suthar**.
 Contact for any privacy question or request: **nikhilsuthar301@gmail.com**
 
 This policy explains what information the app uses, why, who receives it, how long it is kept and what choices you have. By using the app you agree to this policy. If you do not agree, please do not use the app.
@@ -101,4 +101,4 @@ Coins and stakes are **virtual items in the game**. They have no real-world valu
 We may update this policy. The “Last updated” date will change and, for significant changes, we will show a notice in the app or release notes.
 
 ## 14. Contact
-Weetech · **nikhilsuthar301@gmail.com**
+Nikhil Suthar · **nikhilsuthar301@gmail.com**

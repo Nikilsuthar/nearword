@@ -1,4 +1,4 @@
-package com.weetech.nearword
+package com.nikhilsuthar.nearword
 
 import io.flutter.embedding.android.FlutterActivity
 

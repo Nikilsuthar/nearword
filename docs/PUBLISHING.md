@@ -1,7 +1,7 @@
 # Publishing NearWord on Google Play
 
 Version: **0.0.1 (build 1)** – first release (`version: 0.0.1+1` in `pubspec.yaml`).
-Package name: `com.weetech.nearword` (cannot be changed after the first upload).
+Package name: `com.nikhilsuthar.nearword` (cannot be changed after the first upload).
 
 ## 1. Files
 - `dist/NearWord-0.0.1+1.aab` – upload this to Play Console (signed with the upload key).
